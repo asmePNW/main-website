@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 
 interface Event {
   id: number;
@@ -56,7 +57,7 @@ export default function EventsPage() {
               className="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
             >
               <div className="h-48 w-full overflow-hidden">
-                <img
+                <Image
                   src={event.image}
                   alt={event.title}
                   className="object-cover w-full h-full"
