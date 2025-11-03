@@ -49,7 +49,7 @@ export default function EventsPage() {
           Upcoming Events
         </h1>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-3 gap-8">
           {events.map((event) => (
             <div
               key={event.id}
@@ -75,9 +75,6 @@ export default function EventsPage() {
                 <p className="text-gray-700 text-sm mb-4">
                   {event.description}
                 </p>
-                <button className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-lg transition-colors">
-                  Learn More
-                </button>
               </div>
             </div>
           ))}

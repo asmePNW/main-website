@@ -1,6 +1,6 @@
-import {Button} from "@/ui/button";
+import { Button } from "../ui/buttons/button";
 import Link from "next/link";
-import TypingText from "@/components/ui/shadcn-io/typing-text";
+import TypingText from "@/components/ui/typing-text";
 
 export default function TitleCard() {
 

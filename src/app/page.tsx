@@ -1,8 +1,8 @@
 import TitleCard from '@/components/home/titleCard';
-import {InfoCard} from '@/ui/InfoCard/InfoCard';
+import { InfoCard } from '@/components/ui/cards/InfoCard';
 import Image from 'next/image';
 import {CountingNumber} from '@/components/ui/shadcn-io/counting-number';
-import { RouterButton } from '@/ui/RouterButton';
+import { RouterButton } from '@/components/ui/buttons/RouterButton';
 
 export default function Home() {
     return (

@@ -6,52 +6,49 @@ import Image from "next/image"
 import {useState} from "react"
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome"
 import {faBars, faXmark} from "@fortawesome/free-solid-svg-icons"
-import {RouterButton} from "@/ui/RouterButton"
+import {RouterButton} from "@/components/ui/buttons/RouterButton"
+import {NAV_LINKS} from "@/config/routes"
 
 export function Navbar() {
     const [open,
         setOpen] = useState(false)
 
-    const navLinks = [
+    const links = [
         {
             name: "Home",
-            href: "/"
+            href: NAV_LINKS.HOME
         }, {
             name: "Projects",
-            href: "/projects"
+            href: NAV_LINKS.PROJECTS
         }, {
             name: "Team",
-            href: "/team"
+            href: NAV_LINKS.TEAM
         }, {
             name: "Events",
-            href: "/events"
+            href: NAV_LINKS.EVENTS
         }, {
             name: "Contact",
-            href: "/contact"
+            href: NAV_LINKS.CONTACT
         }
     ]
     return (
-        <header
-            className="w-full border-b bg-white backdrop-blur absolute z-50 ">
+        <header className="w-full border-b bg-white backdrop-blur z-50">
             <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-
                 <Link href="/" className="flex items-center gap-3">
-                
                     <Image
                         src="/asme-logo.png"
                         alt="ASME Purdue Northwest"
                         width={70}
                         height={70}
-                        style={{ width: 'auto', height: 'auto' }}
-                        className=""/>
-
+                        className="w-auto h-16"/>
                     <span className="font-semibold text-lg tracking-tight">
                         Purdue Northwest Section
                     </span>
                 </Link>
 
+                {/* Desktop links */}
                 <div className="hidden md:flex items-center gap-6">
-                    {navLinks.map((link) => (
+                    {links.map((link) => (
                         <RouterButton
                             key={link.name}
                             href={link.href}
@@ -61,25 +58,29 @@ export function Navbar() {
                             {link.name}
                         </RouterButton>
                     ))}
-                    <RouterButton href="/join" variant="default" size="sm">
+                    <RouterButton href={NAV_LINKS.JOIN} variant="default" size="sm">
                         Join Us
                     </RouterButton>
                 </div>
 
+                {/* Mobile toggle */}
                 <button
                     className="md:hidden"
                     onClick={() => setOpen(!open)}
                     aria-label="Toggle menu">
-                    {open
-                        ? <FontAwesomeIcon icon={faXmark} className="size-6"/>
-                        : <FontAwesomeIcon icon={faBars} className="size-6"/>}
+                    <FontAwesomeIcon
+                        icon={open
+                        ? faXmark
+                        : faBars}
+                        className="w-6 h-6"/>
                 </button>
             </nav>
 
+            {/* Mobile menu */}
             {open && (
                 <div
-                    className="md:hidden flex flex-col items-center gap-4 pb-6 bg-background border-t">
-                    {navLinks.map((link) => (
+                    className="md:hidden flex flex-col items-center gap-4 pb-6 bg-white border-t">
+                    {links.map((link) => (
                         <RouterButton
                             key={link.name}
                             href={link.href}
@@ -90,7 +91,7 @@ export function Navbar() {
                         </RouterButton>
                     ))}
                     <RouterButton
-                        href="/join"
+                        href={NAV_LINKS.JOIN}
                         variant="default"
                         size="default"
                         onClick={() => setOpen(false)}>
