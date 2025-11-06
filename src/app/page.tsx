@@ -1,13 +1,15 @@
 import TitleCard from '@/components/home/titleCard';
-import { InfoCard } from '@/components/ui/cards/InfoCard';
+import {InfoCard} from '@/components/ui/cards/InfoCard';
 import Image from 'next/image';
 import {CountingNumber} from '@/components/ui/shadcn-io/counting-number';
-import { RouterButton } from '@/components/ui/buttons/RouterButton';
+import {RouterButton} from '@/components/ui/buttons/RouterButton';
 
 export default function Home() {
     return (
         <div>
-            <TitleCard/>
+
+                <TitleCard/>
+
 
             <div className="mx-auto max-w-3xl px-6 py-12">
                 <section className="space-y-6">
@@ -95,7 +97,6 @@ export default function Home() {
                     </div>
                 </section>
             </div>
-
 
             <div className="mx-auto px-10 py-12 bg-gray-100">
                 <section className="flex items-center justify-between space-x-8">

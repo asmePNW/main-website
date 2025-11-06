@@ -17,8 +17,9 @@ const routerButtonVariants = cva(
       size: {
         default: "px-4 py-2 h-9",
         sm: "px-3 py-1.5 text-sm",
+        md: "px-5 py-2.5 text-sm",
         lg: "px-6 py-3 text-base",
-      },
+      }
     },
     defaultVariants: {
       variant: "default",

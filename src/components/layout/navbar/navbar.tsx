@@ -8,6 +8,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome"
 import {faBars, faXmark} from "@fortawesome/free-solid-svg-icons"
 import {RouterButton} from "@/components/ui/buttons/RouterButton"
 import {NAV_LINKS} from "@/config/routes"
+import ASMEPNWLogo from "../../../../public/ASMEPNWLogo.png";
 
 export function Navbar() {
     const [open,
@@ -32,18 +33,15 @@ export function Navbar() {
         }
     ]
     return (
-        <header className="w-full border-b bg-white backdrop-blur z-50">
-            <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+        <header className="w-full border-b bg-white top-0 sticky left-0 z-50 shadow-sm h-20">
+            <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-2">
                 <Link href="/" className="flex items-center gap-3">
                     <Image
-                        src="/asme-logo.png"
+                        src={ASMEPNWLogo}
+                        priority={true}
+                        loading="eager"
                         alt="ASME Purdue Northwest"
-                        width={70}
-                        height={70}
                         className="w-auto h-16"/>
-                    <span className="font-semibold text-lg tracking-tight">
-                        Purdue Northwest Section
-                    </span>
                 </Link>
 
                 {/* Desktop links */}
@@ -53,7 +51,7 @@ export function Navbar() {
                             key={link.name}
                             href={link.href}
                             variant="ghost"
-                            size="sm"
+                            size="lg"
                             className="text-foreground/80 hover:text-foreground">
                             {link.name}
                         </RouterButton>
