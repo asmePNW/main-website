@@ -1,7 +1,7 @@
 "use client";
 
 import {useState, useEffect, useCallback} from "react";
-import {Button} from "./buttons/button";
+import {Button} from "./buttons/Button";
 import {X, CheckCircle, AlertCircle, Info, AlertTriangle} from "lucide-react";
 import {cn} from "@/lib/utils";
 import {Alert, AlertDescription} from "./alert";

@@ -3,7 +3,7 @@
 import Link from "next/link"
 import {usePathname} from "next/navigation"
 import {cn} from "@/lib/utils"
-import {Button} from "@/components/ui/buttons/button"
+import {Button} from "@/components/ui/buttons/Button"
 import {Home, FolderKanban, Users, Calendar} from "lucide-react"
 import {DASHBOARD_ROUTES} from "@/config/routes"
 

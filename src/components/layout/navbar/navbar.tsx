@@ -6,7 +6,7 @@ import Image from "next/image"
 import {useState} from "react"
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome"
 import {faBars, faXmark} from "@fortawesome/free-solid-svg-icons"
-import {RouterButton} from "@/components/ui/buttons/RouterButton"
+import {Button} from '@/components/ui/buttons/Button'
 import {NAV_LINKS} from "@/config/routes"
 import ASMEPNWLogo from "../../../../public/ASMEPNWLogo.png";
 
@@ -33,37 +33,44 @@ export function Navbar() {
         }
     ]
     return (
-        <header className="w-full border-b bg-white top-0 sticky left-0 z-50 shadow-sm h-20">
-            <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-2">
-                <Link href="/" className="flex items-center gap-3">
+        <header
+            className="w-full border-b bg-white top-0 sticky left-0 z-50 shadow-sm">
+            <nav className="relative flex items-center justify-between px-4 sm:px-8 lg:px-[15%] py-4 gap-4">
+                <Link href="/" className="flex items-center gap-3 shrink-0">
                     <Image
                         src={ASMEPNWLogo}
                         priority={true}
                         loading="eager"
                         alt="ASME Purdue Northwest"
-                        className="w-auto h-16"/>
+                        className="w-auto h-12 sm:h-14 md:h-16"/>
                 </Link>
 
-                {/* Desktop links */}
-                <div className="hidden md:flex items-center gap-6">
+                {/* Desktop links - Center */}
+                <div className="hidden md:flex items-center gap-2 lg:gap-4 xl:gap-6 flex-1 justify-center">
                     {links.map((link) => (
-                        <RouterButton
-                            key={link.name}
-                            href={link.href}
-                            variant="ghost"
-                            size="lg"
-                            className="text-foreground/80 hover:text-foreground">
-                            {link.name}
-                        </RouterButton>
+                        <Link key={link.name} href={link.href}>
+                            <Button
+                                key={link.name}
+                                variant="ghost"
+                                size="md"
+                                className="text-black text-lg lg:text-md hover:text-foreground whitespace-nowrap">
+                                {link.name}
+                            </Button>
+                        </Link>
                     ))}
-                    <RouterButton href={NAV_LINKS.JOIN} variant="default" size="sm">
-                        Join Us
-                    </RouterButton>
+                </div>
+
+                <div className="hidden md:block shrink-0">
+                    <Link href="https://mypnwlife.pnw.edu/ASME/club_signup">
+                        <Button className="hover:bg-gray-200 hover:text-black text-md " variant="default" size="sm">
+                            Join Us
+                        </Button>
+                    </Link>
                 </div>
 
                 {/* Mobile toggle */}
-                <button
-                    className="md:hidden"
+                <Button
+                    className="md:hidden shrink-0"
                     onClick={() => setOpen(!open)}
                     aria-label="Toggle menu">
                     <FontAwesomeIcon
@@ -71,7 +78,7 @@ export function Navbar() {
                         ? faXmark
                         : faBars}
                         className="w-6 h-6"/>
-                </button>
+                </Button>
             </nav>
 
             {/* Mobile menu */}
@@ -79,22 +86,21 @@ export function Navbar() {
                 <div
                     className="md:hidden flex flex-col items-center gap-4 pb-6 bg-white border-t">
                     {links.map((link) => (
-                        <RouterButton
-                            key={link.name}
-                            href={link.href}
-                            variant="ghost"
-                            size="default"
-                            onClick={() => setOpen(false)}>
-                            {link.name}
-                        </RouterButton>
+                        <Link href={link.href}>
+                            <Button
+                                key={link.name}
+                                variant="ghost"
+                                size="default"
+                                onClick={() => setOpen(false)}>
+                                {link.name}
+                            </Button>
+                        </Link>
                     ))}
-                    <RouterButton
-                        href={NAV_LINKS.JOIN}
-                        variant="default"
-                        size="default"
-                        onClick={() => setOpen(false)}>
-                        Join Us
-                    </RouterButton>
+                    <Link href={NAV_LINKS.JOIN}>
+                        <Button variant="default" size="default" onClick={() => setOpen(false)}>
+                            Join Us
+                        </Button>
+                    </Link>
                 </div>
             )}
         </header>

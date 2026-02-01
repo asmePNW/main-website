@@ -8,6 +8,23 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  
+  /* Purdue Primary Colors */
+  --color-purdue-gold: #CFB991;
+  --color-purdue-black: #000000;
+  
+  /* Purdue Supporting Colors - Gold Variants */
+  --color-purdue-aged: #8E6F3E;
+  --color-purdue-rush: #DAAA00;
+  --color-purdue-field: #DDB945;
+  --color-purdue-dust: #EBD99F;
+  
+  /* Purdue Supporting Colors - Gray Variants */
+  --color-purdue-steel: #555960;
+  --color-purdue-coolgray: #6F727B;
+  --color-purdue-railway: #9D9795;
+  --color-purdue-steam: #C4BFC0;
+  
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-primary: var(--primary);
@@ -113,6 +130,9 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
+  }
+  html {
+    scroll-behavior: smooth;
   }
   body {
     @apply bg-background text-foreground;

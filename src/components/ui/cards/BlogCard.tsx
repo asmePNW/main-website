@@ -1,6 +1,8 @@
 import React from 'react';
 import { ArrowRight } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
+
 interface BlogCardProps {
   image: string;
   date: string;
@@ -8,6 +10,7 @@ interface BlogCardProps {
   categoryColor?: 'teal' | 'blue' | 'green' | 'purple' | 'red';
   title: string;
   description: string;
+  href?: string;
 }
 
 export const BlogCard: React.FC<BlogCardProps> = ({ 
@@ -16,7 +19,8 @@ export const BlogCard: React.FC<BlogCardProps> = ({
   category, 
   categoryColor = 'teal',
   title, 
-  description 
+  description,
+  href
 }) => {
   const categoryColors: Record<string, string> = {
     teal: 'bg-teal-600',
@@ -54,12 +58,21 @@ export const BlogCard: React.FC<BlogCardProps> = ({
           {description}
         </p>
         
-        <button className="flex items-center gap-2 text-sm font-medium text-gray-900 hover:text-teal-600 transition-colors group">
-          READ MORE
-          <span className="w-6 h-6 rounded-full bg-gray-900 group-hover:bg-teal-600 flex items-center justify-center transition-colors">
-            <ArrowRight className="w-3 h-3 text-white" />
-          </span>
-        </button>
+        {href ? (
+          <Link href={href} className="flex items-center gap-2 text-sm font-medium text-gray-900 hover:text-teal-600 transition-colors group">
+            READ MORE
+            <span className="w-6 h-6 rounded-full bg-gray-900 group-hover:bg-teal-600 flex items-center justify-center transition-colors">
+              <ArrowRight className="w-3 h-3 text-white" />
+            </span>
+          </Link>
+        ) : (
+          <button className="flex items-center gap-2 text-sm font-medium text-gray-900 hover:text-teal-600 transition-colors group">
+            READ MORE
+            <span className="w-6 h-6 rounded-full bg-gray-900 group-hover:bg-teal-600 flex items-center justify-center transition-colors">
+              <ArrowRight className="w-3 h-3 text-white" />
+            </span>
+          </button>
+        )}
       </div>
     </div>
   );

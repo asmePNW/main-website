@@ -2,6 +2,8 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faLinkedin, faGithub} from "@fortawesome/free-brands-svg-icons";
 import {faEnvelope, faHandshake} from "@fortawesome/free-solid-svg-icons";
 import Image, {StaticImageData} from "next/image";
+import { cva, type VariantProps } from "class-variance-authority";
+import { cn } from "@/lib/utils";
 
 interface SocialLinks {
     email?: string;
@@ -10,13 +12,29 @@ interface SocialLinks {
     gitHub?: string;
 }
 
-interface TeamCardProps {
+const teamCardVariants = cva(
+    "flex flex-col rounded-lg shadow-md overflow-hidden max-w-sm transition-shadow duration-300 h-full",
+    {
+        variants: {
+            variant: {
+                default: "bg-white hover:shadow-xl",
+                outlined: "bg-white border-2 border-gray-200 hover:border-purdue-gold hover:shadow-lg",
+            },
+        },
+        defaultVariants: {
+            variant: "default",
+        },
+    }
+);
+
+interface TeamCardProps extends VariantProps<typeof teamCardVariants> {
     image : string | StaticImageData;
     name : string;
     role : string;
     major : string;
     bio : string;
     socialLinks?: SocialLinks;
+    className?: string;
 }
 
 export const TeamCard : React.FC < TeamCardProps > = ({
@@ -25,11 +43,12 @@ export const TeamCard : React.FC < TeamCardProps > = ({
     role,
     major,
     bio,
-    socialLinks
+    socialLinks,
+    variant,
+    className
 }) => {
     return (
-        <div
-            className="flex flex-col bg-white rounded-lg shadow-md overflow-hidden max-w-sm hover:shadow-xl transition-shadow duration-300 h-full">
+        <div className={cn(teamCardVariants({ variant }), className)}>
             <div className="relative h-64 overflow-hidden bg-gray-200">
                 <Image
                     src={image || "https://via.placeholder.com/400x400.png?text=ASME+Member"}

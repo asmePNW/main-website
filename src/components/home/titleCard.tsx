@@ -1,6 +1,7 @@
-import {Button} from "../ui/buttons/button";
+import {Button} from "../ui/buttons/Button";
 import Link from "next/link";
 import TypingText from "@/components/ui/typing-text";
+import {ScrollButton} from "../ui/buttons/ScrollButton";
 
 export default function TitleCard() {
     return (
@@ -22,7 +23,7 @@ export default function TitleCard() {
                 <section className="flex h-full justify-center items-center w-full relative z-20 ">
                     <div className="max-w-2xl">
                         <TypingText
-                            text={["Design. Build. Inspire.", "Think. Solve. Achieve.", "Innovate. Collaborate. Lead."]}
+                            text={["DESIGN. BUILD. INSPIRE.", "THINK. SOLVE. ACHIEVE.", "INNOVATE. COLLABORATE. LEAD."]}
                             typingSpeed={200}
                             pauseDuration={1500}
                             showCursor={true}
@@ -32,20 +33,21 @@ export default function TitleCard() {
                             min: 50,
                             max: 120
                         }}/>
-                        <p className="text-lg text-gray-200 mb-8">
-                            Advancing mechanical engineering at Purdue University Northwest through student
-                            innovation and collaboration.
+                        <p className="text-4xl text-yellow-400 mb-8">
+                           Purdue Northwest ASME Student Chapter
                         </p>
 
                         <div className="flex justify-center gap-4">
-                            <Link href="/join">
+                            <Link href="https://mypnwlife.pnw.edu/ASME/club_signup">
                                 <Button className="hover:text-black hover:bg-white">Join Us!</Button>
                             </Link>
-                            <Link href="/learn-more">
-                                <Button variant="outline" className="hover:text-white hover:bg-black">
-                                    Learn More
-                                </Button>
-                            </Link>
+                            <ScrollButton 
+                                variant="outline" 
+                                className="hover:text-white hover:bg-black"
+                                targetId="mission"
+                            >
+                                Learn More
+                            </ScrollButton>
                         </div>
                     </div>
                 </section>

@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { Button } from "@/components/ui/buttons/button"
+import { Button } from "@/components/ui/buttons/Button"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faTriangleExclamation } from "@fortawesome/free-solid-svg-icons"
 
