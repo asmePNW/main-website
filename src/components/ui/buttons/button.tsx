@@ -57,4 +57,4 @@ function Button({
         {...props}/>)
 }
 
-export {Button}
+export {Button, buttonVariants}
