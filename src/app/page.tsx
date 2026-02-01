@@ -92,7 +92,7 @@ export default function Home() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
                     <div
                         className="relative rounded-3xl aspect-square flex items-center justify-center overflow-hidden">
-                        <Image src="/square4.jpg" alt="3D Printing Hub" fill className="object-cover"/>
+                        <Image src="/3dCAR.jpg" alt="3D Printing Hub" fill className="object-cover"/>
                     </div>
                     <div className="order-1 md:order-2">
                         <h2 className="text-3xl font-bold text-purdue-black mb-4">
@@ -115,7 +115,7 @@ export default function Home() {
                     <div
                         className="relative rounded-3xl aspect-square flex items-center justify-center overflow-hidden">
                         <Image
-                            src="/square2.jpg"
+                            src="/ELECTRONICS.jpg"
                             alt="Senior Design Showcase"
                             fill
                             className="object-cover"/>

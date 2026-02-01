@@ -45,7 +45,7 @@ export default function EventsPage() {
                 {/* Background Image */}
                 <div className="absolute inset-0 z-0">
                     <Image
-                        src="/carbonfiber.png"
+                        src="/CarbonFiber.png"
                         alt="Events Background"
                         fill
                         className="opacity-90 object-cover"
