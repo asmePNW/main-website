@@ -2,9 +2,16 @@
 
 import {useState, useEffect, useCallback} from "react";
 import {Button} from "./buttons/Button";
-import {X, CheckCircle, AlertCircle, Info, AlertTriangle} from "lucide-react";
-import {cn} from "@/lib/utils";
+import {cn} from "./utils";
 import {Alert, AlertDescription} from "./alert";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { 
+  faTimes, 
+  faCheckCircle, 
+  faExclamationCircle, 
+  faCircleInfo, 
+  faTriangleExclamation 
+} from '@fortawesome/free-solid-svg-icons';
 
 interface ToastProps {
     message : string;
@@ -17,10 +24,10 @@ interface ToastProps {
 }
 
 const toastIcons = {
-    success: CheckCircle,
-    error: AlertCircle,
-    warning: AlertTriangle,
-    info: Info
+    success: faCheckCircle,
+    error: faExclamationCircle,
+    warning: faTriangleExclamation,
+    info: faCircleInfo
 };
 
 const toastStyles = {
@@ -89,16 +96,15 @@ export function Toast({
                 ? "-translate-y-full opacity-0"
                 : "translate-y-full opacity-0")}>
             <Alert className={cn(toastStyles[type], "shadow-lg", className)}>
-                <Icon className="h-4 w-4"/>
+                <FontAwesomeIcon icon={Icon} className="h-4 w-4"/>
                 <AlertDescription className="flex items-center justify-between">
                     <span>{message}</span>
                     {showCloseButton && (
                         <Button
                             variant="ghost"
-                            size="icon-sm"
                             onClick={handleClose}
                             className="ml-2 h-6 w-6 opacity-70 hover:opacity-100">
-                            <X className="h-3 w-3"/>
+                            <FontAwesomeIcon icon={faTimes} className="h-3 w-3"/>
                         </Button>
                     )}
                 </AlertDescription>

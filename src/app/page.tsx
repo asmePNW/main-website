@@ -6,8 +6,23 @@ import {Button} from '@/components/ui/buttons/Button';
 import Link from 'next/link';
 import {faLink} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import { createClient } from '@/lib/supabase/server';
 
-export default function Home() {
+export default async function Home() {
+    // Fetch sponsors from database
+    const supabase = await createClient();
+    const { data: allSponsors } = await supabase
+        .from('sponsors')
+        .select('*')
+        .order('order_index', { ascending: true, nullsFirst: false })
+        .order('name', { ascending: true });
+
+    const sponsors = {
+        platinum: allSponsors?.filter(s => s.tier === 'platinum') || [],
+        gold: allSponsors?.filter(s => s.tier === 'gold') || [],
+        silver: allSponsors?.filter(s => s.tier === 'silver') || [],
+        bronze: allSponsors?.filter(s => s.tier === 'bronze') || [],
+    };
 
     interface Event {
         id : number;
@@ -73,7 +88,7 @@ export default function Home() {
                         <h2 className="text-3xl font-bold text-purdue-black mb-4">
                             Shell-Eco Marathon
                         </h2>
-                        <p className="text-lg text-gray-600">
+                        <p className="text-2xl text-gray-600">
                             Students build and race energy-efficient vehicles in the Shell Eco-Marathon
                             competition.
                         </p>
@@ -81,7 +96,7 @@ export default function Home() {
                     <div
                         className="relative rounded-3xl aspect-square flex items-center justify-center overflow-hidden">
                         <Image
-                            src="/square1.png"
+                            src="/team.jpg"
                             alt="Senior Design Showcase"
                             fill
                             className="object-cover"/>
@@ -98,7 +113,7 @@ export default function Home() {
                         <h2 className="text-3xl font-bold text-purdue-black mb-4">
                             3D Printing Hub.
                         </h2>
-                        <p className="text-lg text-gray-600">
+                        <p className="text-2xl text-gray-600">
                             Hands-on training with professional-grade additive manufacturing tools.
                         </p>
                     </div>
@@ -108,7 +123,7 @@ export default function Home() {
                         <h2 className="text-3xl font-bold text-purdue-black mb-4">
                             Senior Design Showcase.
                         </h2>
-                        <p className="text-lg text-gray-600">
+                        <p className="text-2xl text-gray-600">
                             Showcases research-driven capstone design projects that integrate engineering theory, applied research, and real-world problem solving within a research university setting.
                         </p>
                     </div>
@@ -207,7 +222,7 @@ export default function Home() {
             <div className="py-30 px-[15%]">
                 <section className="space-y-6">
                     <h2 className="text-3xl font-bold text-center">The Fastest Growing Club at Purdue</h2>
-                    <p className="text-lg text-justify">
+                    <p className="text-2xl text-justify">
                         Becoming a member of ASME PNW opens doors to numerous opportunities. Participate
                         in exciting projects, attend workshops, and connect with like-minded peers and
                         professionals in the field. We welcome students from all years and backgrounds
@@ -267,225 +282,149 @@ export default function Home() {
                     </div>
 
                     {/* Platinum Sponsors */}
-                    <div className="mb-10">
-                        <h3 className="text-2xl font-bold text-center mb-6 text-gray-700">
-                            <span
-                                className="inline-block px-4 py-1 bg-linear-to-r from-gray-300 via-gray-100 to-gray-300 rounded-full">
-                                Platinum Sponsors
-                            </span>
-                        </h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 justify-items-center">
-                            <Card className="w-full max-w-md bg-white hover:shadow-lg transition-shadow">
-                                <CardContent className="flex flex-col items-center p-6">
-                                    <Image
-                                        src="/sponsors/platinum1.png"
-                                        alt="Platinum Sponsor"
-                                        width={200}
-                                        height={100}
-                                        className="object-contain mb-4"/>
-                                    <CardTitle className="text-lg">Platinum Partner Co.</CardTitle>
-                                    <CardDescription className="text-center">Leading innovation in engineering solutions</CardDescription>
-                                </CardContent>
-                            </Card>
-                            <Card className="w-full max-w-md bg-white hover:shadow-lg transition-shadow">
-                                <CardContent className="flex flex-col items-center p-6">
-                                    <Image
-                                        src="/sponsors/platinum2.png"
-                                        alt="Platinum Sponsor"
-                                        width={200}
-                                        height={100}
-                                        className="object-contain mb-4"/>
-                                    <CardTitle className="text-lg">Tech Industries Inc.</CardTitle>
-                                    <CardDescription className="text-center">Empowering the next generation of engineers</CardDescription>
-                                </CardContent>
-                            </Card>
+                    {sponsors.platinum.length > 0 && (
+                        <div className="mb-10">
+                            <h3 className="text-2xl font-bold text-center mb-6 text-gray-700">
+                                <span
+                                    className="inline-block px-4 py-1 bg-linear-to-r from-gray-300 via-gray-100 to-gray-300 rounded-full">
+                                    Platinum Sponsors
+                                </span>
+                            </h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 justify-items-center">
+                                {sponsors.platinum.map((sponsor) => (
+                                    <Card key={sponsor.id} className="w-full max-w-md bg-white hover:shadow-lg transition-shadow">
+                                        <CardContent className="flex flex-col items-center p-6">
+                                            {sponsor.logo_url ? (
+                                                <Image
+                                                    src={sponsor.logo_url}
+                                                    alt={sponsor.name}
+                                                    width={200}
+                                                    height={100}
+                                                    className="object-contain mb-4"/>
+                                            ) : (
+                                                <div className="w-[200px] h-[100px] bg-gray-100 rounded flex items-center justify-center mb-4">
+                                                    <span className="text-gray-400">{sponsor.name}</span>
+                                                </div>
+                                            )}
+                                            <CardTitle className="text-lg">{sponsor.name}</CardTitle>
+                                            {sponsor.description && (
+                                                <p className="text-sm text-gray-500 text-center mt-2">{sponsor.description}</p>
+                                            )}
+                                        </CardContent>
+                                    </Card>
+                                ))}
+                            </div>
                         </div>
-                    </div>
+                    )}
 
                     {/* Gold Sponsors */}
-                    <div className="mb-10">
-                        <h3 className="text-2xl font-bold text-center mb-6 text-yellow-600">
-                            <span
-                                className="inline-block px-4 py-1 bg-linear-to-r from-yellow-300 via-yellow-100 to-yellow-300 rounded-full">
-                                Gold Sponsors
-                            </span>
-                        </h3>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 justify-items-center">
-                            <Card
-                                className="w-full max-w-sm bg-white hover:shadow-lg transition-shadow border-yellow-200">
-                                <CardContent className="flex flex-col items-center p-5">
-                                    <Image
-                                        src="/sponsors/gold1.png"
-                                        alt="Gold Sponsor"
-                                        width={150}
-                                        height={75}
-                                        className="object-contain mb-3"/>
-                                    <CardTitle className="text-base">Gold Sponsor 1</CardTitle>
-                                    <CardDescription className="text-center text-sm">Supporting ASME excellence</CardDescription>
-                                </CardContent>
-                            </Card>
-                            <Card
-                                className="w-full max-w-sm bg-white hover:shadow-lg transition-shadow border-yellow-200">
-                                <CardContent className="flex flex-col items-center p-5">
-                                    <Image
-                                        src="/sponsors/gold2.png"
-                                        alt="Gold Sponsor"
-                                        width={150}
-                                        height={75}
-                                        className="object-contain mb-3"/>
-                                    <CardTitle className="text-base">Gold Sponsor 2</CardTitle>
-                                    <CardDescription className="text-center text-sm">Driving engineering innovation</CardDescription>
-                                </CardContent>
-                            </Card>
-                            <Card
-                                className="w-full max-w-sm bg-white hover:shadow-lg transition-shadow border-yellow-200">
-                                <CardContent className="flex flex-col items-center p-5">
-                                    <Image
-                                        src="/sponsors/gold3.png"
-                                        alt="Gold Sponsor"
-                                        width={150}
-                                        height={75}
-                                        className="object-contain mb-3"/>
-                                    <CardTitle className="text-base">Gold Sponsor 3</CardTitle>
-                                    <CardDescription className="text-center text-sm">Investing in future talent</CardDescription>
-                                </CardContent>
-                            </Card>
+                    {sponsors.gold.length > 0 && (
+                        <div className="mb-10">
+                            <h3 className="text-2xl font-bold text-center mb-6 text-yellow-600">
+                                <span
+                                    className="inline-block px-4 py-1 bg-linear-to-r from-yellow-300 via-yellow-100 to-yellow-300 rounded-full">
+                                    Gold Sponsors
+                                </span>
+                            </h3>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 justify-items-center">
+                                {sponsors.gold.map((sponsor) => (
+                                    <Card key={sponsor.id} className="w-full max-w-sm bg-white hover:shadow-lg transition-shadow border-yellow-200">
+                                        <CardContent className="flex flex-col items-center p-5">
+                                            {sponsor.logo_url ? (
+                                                <Image
+                                                    src={sponsor.logo_url}
+                                                    alt={sponsor.name}
+                                                    width={150}
+                                                    height={75}
+                                                    className="object-contain mb-3"/>
+                                            ) : (
+                                                <div className="w-[150px] h-[75px] bg-gray-100 rounded flex items-center justify-center mb-3">
+                                                    <span className="text-gray-400 text-sm">{sponsor.name}</span>
+                                                </div>
+                                            )}
+                                            <CardTitle className="text-base">{sponsor.name}</CardTitle>
+                                            {sponsor.description && (
+                                                <p className="text-xs text-gray-500 text-center mt-1 line-clamp-2">{sponsor.description}</p>
+                                            )}
+                                        </CardContent>
+                                    </Card>
+                                ))}
+                            </div>
                         </div>
-                    </div>
+                    )}
 
                     {/* Silver Sponsors */}
-                    <div className="mb-10">
-                        <h3 className="text-2xl font-bold text-center mb-6 text-gray-500">
-                            <span
-                                className="inline-block px-4 py-1 bg-linear-to-r from-gray-400 via-gray-200 to-gray-400 rounded-full">
-                                Silver Sponsors
-                            </span>
-                        </h3>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 justify-items-center">
-                            <Card className="w-full bg-white hover:shadow-md transition-shadow">
-                                <CardContent className="flex flex-col items-center p-4">
-                                    <Image
-                                        src="/sponsors/silver1.png"
-                                        alt="Silver Sponsor"
-                                        width={120}
-                                        height={60}
-                                        className="object-contain mb-2"/>
-                                    <CardTitle className="text-sm">Silver Sponsor 1</CardTitle>
-                                </CardContent>
-                            </Card>
-                            <Card className="w-full bg-white hover:shadow-md transition-shadow">
-                                <CardContent className="flex flex-col items-center p-4">
-                                    <Image
-                                        src="/sponsors/silver2.png"
-                                        alt="Silver Sponsor"
-                                        width={120}
-                                        height={60}
-                                        className="object-contain mb-2"/>
-                                    <CardTitle className="text-sm">Silver Sponsor 2</CardTitle>
-                                </CardContent>
-                            </Card>
-                            <Card className="w-full bg-white hover:shadow-md transition-shadow">
-                                <CardContent className="flex flex-col items-center p-4">
-                                    <Image
-                                        src="/sponsors/silver3.png"
-                                        alt="Silver Sponsor"
-                                        width={120}
-                                        height={60}
-                                        className="object-contain mb-2"/>
-                                    <CardTitle className="text-sm">Silver Sponsor 3</CardTitle>
-                                </CardContent>
-                            </Card>
-                            <Card className="w-full bg-white hover:shadow-md transition-shadow">
-                                <CardContent className="flex flex-col items-center p-4">
-                                    <Image
-                                        src="/sponsors/silver4.png"
-                                        alt="Silver Sponsor"
-                                        width={120}
-                                        height={60}
-                                        className="object-contain mb-2"/>
-                                    <CardTitle className="text-sm">Silver Sponsor 4</CardTitle>
-                                </CardContent>
-                            </Card>
+                    {sponsors.silver.length > 0 && (
+                        <div className="mb-10">
+                            <h3 className="text-2xl font-bold text-center mb-6 text-gray-500">
+                                <span
+                                    className="inline-block px-4 py-1 bg-linear-to-r from-gray-400 via-gray-200 to-gray-400 rounded-full">
+                                    Silver Sponsors
+                                </span>
+                            </h3>
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 justify-items-center">
+                                {sponsors.silver.map((sponsor) => (
+                                    <Card key={sponsor.id} className="w-full bg-white hover:shadow-md transition-shadow">
+                                        <CardContent className="flex flex-col items-center p-4">
+                                            {sponsor.logo_url ? (
+                                                <Image
+                                                    src={sponsor.logo_url}
+                                                    alt={sponsor.name}
+                                                    width={120}
+                                                    height={60}
+                                                    className="object-contain mb-2"/>
+                                            ) : (
+                                                <div className="w-[120px] h-[60px] bg-gray-100 rounded flex items-center justify-center mb-2">
+                                                    <span className="text-gray-400 text-xs">{sponsor.name}</span>
+                                                </div>
+                                            )}
+                                            <CardTitle className="text-sm">{sponsor.name}</CardTitle>
+                                        </CardContent>
+                                    </Card>
+                                ))}
+                            </div>
                         </div>
-                    </div>
+                    )}
 
                     {/* Bronze Sponsors */}
-                    <div>
-                        <h3 className="text-2xl font-bold text-center mb-6 text-amber-700">
-                            <span
-                                className="inline-block px-4 py-1 bg-linear-to-r from-amber-400 via-amber-200 to-amber-400 rounded-full">
-                                Bronze Sponsors
-                            </span>
-                        </h3>
-                        <div className="grid grid-cols-3 md:grid-cols-6 gap-3 justify-items-center">
-                            <Card className="w-full bg-white hover:shadow-md transition-shadow">
-                                <CardContent className="flex flex-col items-center p-3">
-                                    <Image
-                                        src="/sponsors/bronze1.png"
-                                        alt="Bronze Sponsor"
-                                        width={80}
-                                        height={40}
-                                        className="object-contain mb-1"/>
-                                    <CardTitle className="text-xs">Bronze 1</CardTitle>
-                                </CardContent>
-                            </Card>
-                            <Card className="w-full bg-white hover:shadow-md transition-shadow">
-                                <CardContent className="flex flex-col items-center p-3">
-                                    <Image
-                                        src="/sponsors/bronze2.png"
-                                        alt="Bronze Sponsor"
-                                        width={80}
-                                        height={40}
-                                        className="object-contain mb-1"/>
-                                    <CardTitle className="text-xs">Bronze 2</CardTitle>
-                                </CardContent>
-                            </Card>
-                            <Card className="w-full bg-white hover:shadow-md transition-shadow">
-                                <CardContent className="flex flex-col items-center p-3">
-                                    <Image
-                                        src="/sponsors/bronze3.png"
-                                        alt="Bronze Sponsor"
-                                        width={80}
-                                        height={40}
-                                        className="object-contain mb-1"/>
-                                    <CardTitle className="text-xs">Bronze 3</CardTitle>
-                                </CardContent>
-                            </Card>
-                            <Card className="w-full bg-white hover:shadow-md transition-shadow">
-                                <CardContent className="flex flex-col items-center p-3">
-                                    <Image
-                                        src="/sponsors/bronze4.png"
-                                        alt="Bronze Sponsor"
-                                        width={80}
-                                        height={40}
-                                        className="object-contain mb-1"/>
-                                    <CardTitle className="text-xs">Bronze 4</CardTitle>
-                                </CardContent>
-                            </Card>
-                            <Card className="w-full bg-white hover:shadow-md transition-shadow">
-                                <CardContent className="flex flex-col items-center p-3">
-                                    <Image
-                                        src="/sponsors/bronze5.png"
-                                        alt="Bronze Sponsor"
-                                        width={80}
-                                        height={40}
-                                        className="object-contain mb-1"/>
-                                    <CardTitle className="text-xs">Bronze 5</CardTitle>
-                                </CardContent>
-                            </Card>
-                            <Card className="w-full bg-white hover:shadow-md transition-shadow">
-                                <CardContent className="flex flex-col items-center p-3">
-                                    <Image
-                                        src="/sponsors/bronze6.png"
-                                        alt="Bronze Sponsor"
-                                        width={80}
-                                        height={40}
-                                        className="object-contain mb-1"/>
-                                    <CardTitle className="text-xs">Bronze 6</CardTitle>
-                                </CardContent>
-                            </Card>
+                    {sponsors.bronze.length > 0 && (
+                        <div>
+                            <h3 className="text-2xl font-bold text-center mb-6 text-amber-700">
+                                <span
+                                    className="inline-block px-4 py-1 bg-linear-to-r from-amber-400 via-amber-200 to-amber-400 rounded-full">
+                                    Bronze Sponsors
+                                </span>
+                            </h3>
+                            <div className="grid grid-cols-3 md:grid-cols-6 gap-3 justify-items-center">
+                                {sponsors.bronze.map((sponsor) => (
+                                    <Card key={sponsor.id} className="w-full bg-white hover:shadow-md transition-shadow">
+                                        <CardContent className="flex flex-col items-center p-3">
+                                            {sponsor.logo_url ? (
+                                                <Image
+                                                    src={sponsor.logo_url}
+                                                    alt={sponsor.name}
+                                                    width={80}
+                                                    height={40}
+                                                    className="object-contain mb-1"/>
+                                            ) : (
+                                                <div className="w-[80px] h-[40px] bg-gray-100 rounded flex items-center justify-center mb-1">
+                                                    <span className="text-gray-400 text-[10px]">{sponsor.name}</span>
+                                                </div>
+                                            )}
+                                            <CardTitle className="text-xs">{sponsor.name}</CardTitle>
+                                        </CardContent>
+                                    </Card>
+                                ))}
+                            </div>
                         </div>
-                    </div>
+                    )}
+
+                    {/* No sponsors message */}
+                    {sponsors.platinum.length === 0 && sponsors.gold.length === 0 && sponsors.silver.length === 0 && sponsors.bronze.length === 0 && (
+                        <div className="text-center py-12 text-gray-500">
+                            <p>We are looking for sponsors! Contact us to learn more.</p>
+                        </div>
+                    )}
                 </section>
             </div>
 

@@ -1,6 +1,8 @@
 export const DASHBOARD_ROUTES = {
     DASHBOARD: '/dashboard',
     PROJECTS: '/dashboard/projects',
+    INQUIRIES: '/dashboard/inquiries',
+    SPONSORS: '/dashboard/sponsors',
     TEAM: '/dashboard/teams',
     EVENTS: '/dashboard/events'
 }

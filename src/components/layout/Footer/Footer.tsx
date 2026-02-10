@@ -4,6 +4,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome"
 import {faInstagram, faLinkedin, faFacebook, faXTwitter} from "@fortawesome/free-brands-svg-icons"
 import Image from "next/image"
 import ASMEPNWLogo from "../../../../public/ASMEPNWLogo.png"
+import { Button } from "@/components/ui/buttons/Button"
 
 export function Footer() {
     const year = new Date().getFullYear()
@@ -89,17 +90,22 @@ export function Footer() {
                     </div>
                 </div>
 
-                {/* Right — Social Icons */}
-                <div className="flex items-center gap-4 text-gray-300 flex-shrink-0">
-                    <Link href="https://instagram.com/asme_pnw" target="_blank" aria-label="Instagram" className="hover:text-white transition-colors">
-                        <FontAwesomeIcon icon={faInstagram} className="h-5 w-5"/>
-                    </Link>
-                    <Link href="https://linkedin.com" target="_blank" aria-label="LinkedIn" className="hover:text-white transition-colors">
-                        <FontAwesomeIcon icon={faLinkedin} className="h-5 w-5"/>
-                    </Link>
-                    <Link href="https://x.com" target="_blank" aria-label="X" className="hover:text-white transition-colors">
-                        <FontAwesomeIcon icon={faXTwitter} className="h-5 w-5"/>
-                    </Link>
+                {/* Right — Social Icons & Admin Login */}
+                <div className="flex flex-col items-end gap-4 shrink-0">
+                    <div className="flex items-center gap-4 text-gray-300">
+                        <Link href="https://instagram.com/asme_pnw" target="_blank" aria-label="Instagram" className="hover:text-white transition-colors">
+                            <FontAwesomeIcon icon={faInstagram} className="h-5 w-5"/>
+                        </Link>
+                        <Link href="https://linkedin.com" target="_blank" aria-label="LinkedIn" className="hover:text-white transition-colors">
+                            <FontAwesomeIcon icon={faLinkedin} className="h-5 w-5"/>
+                        </Link>
+                        <Link href="https://x.com" target="_blank" aria-label="X" className="hover:text-white transition-colors">
+                            <FontAwesomeIcon icon={faXTwitter} className="h-5 w-5"/>
+                        </Link>
+                    </div>
+                    <Button variant="default" className="text-gray-300 hover:text-white transition-colors">
+                        <Link href="/login">Admin Login</Link>
+                    </Button>
                 </div>
             </div>
 

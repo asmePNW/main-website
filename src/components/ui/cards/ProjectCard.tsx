@@ -8,7 +8,7 @@ const projectCardVariants = cva(
     {
         variants: {
             variant: {
-                default: "border-2 border-gray-200 hover:border-purdue-gold",
+                default: "border border-transparent hover:border-purdue-gold",
                 elevated: "shadow-md hover:shadow-xl border border-gray-200",
             },
         },

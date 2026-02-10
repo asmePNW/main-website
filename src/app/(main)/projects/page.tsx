@@ -1,88 +1,14 @@
+'use client'
+
 import Link from 'next/link';
 import Image from 'next/image';
 import ProjectCard from '@/components/ui/cards/ProjectCard';
 import DetailedProjectCard from '@/components/ui/cards/DetailedProjectCard';
+import { useProjects, useFeaturedProjects } from '@/hooks/useProjects';
 
 export default function ProjectsPage() {
-    const projectCategories = [
-        {
-            title: 'Project 1',
-            image: '/square1.png',
-            link: '/projects/machine-redesign'
-        }, {
-            title: 'Project 2',
-            image: '/square2.jpg',
-            link: '/projects/solar-car'
-        }, {
-            title: 'Project 3',
-            image: '/square4.jpg',
-            link: '/projects/rover-team'
-        }, {
-            title: 'Project 4',
-            image: '/square1.png',
-            link: '/projects/wind-turbine'
-        }, {
-            title: 'Project 5',
-            image: '/square2.jpg',
-            link: '/projects/3d-printing-hub'
-        }, {
-            title: 'Project 6',
-            image: '/square4.jpg',
-            link: '/projects/biomedical-devices'
-        }
-    ];
-
-
-    const allProjects = [
-        {
-            id: 'machine-redesign',
-            title: 'Machine Redesign',
-            category: 'MECHANICAL DESIGN',
-            description: 'Innovative redesign of industrial machinery to improve efficiency and reduce energy consumption.',
-            image: '/square2.jpg',
-            link: '/projects/machine-redesign'
-        },
-        {
-            id: 'solar-car',
-            title: 'Solar Car',
-            category: 'SUSTAINABLE ENERGY',
-            description: 'Development of a high-efficiency solar-powered vehicle for the American Solar Challenge competition.',
-            image: '/square1.png',
-            link: '/projects/solar-car'
-        },
-        {
-            id: 'rover-team',
-            title: 'Rover Team',
-            category: 'ROBOTICS',
-            description: 'Design and construction of an autonomous rover for the University Rover Challenge.',
-            image: '/square2.jpg',
-            link: '/projects/rover-team'
-        },
-        {
-            id: 'wind-turbine',
-            title: 'Wind Turbine',
-            category: 'RENEWABLE ENERGY',
-            description: 'Small-scale wind turbine design for sustainable campus energy generation.',
-            image: '/square1.png',
-            link: '/projects/wind-turbine'
-        },
-        {
-            id: '3d-printing-hub',
-            title: '3D Printing Hub',
-            category: 'MANUFACTURING',
-            description: 'Hands-on training with professional-grade additive manufacturing tools.',
-            image: '/square4.jpg',
-            link: '/projects/3d-printing-hub'
-        },
-        {
-            id: 'biomedical-devices',
-            title: 'Biomedical Devices',
-            category: 'BIOENGINEERING',
-            description: 'Development of assistive medical devices for improved patient care and rehabilitation.',
-            image: '/square2.jpg',
-            link: '/projects/biomedical-devices'
-        }
-    ];
+    const { data: projects, isLoading, error } = useProjects('published');
+    const { data: featuredProjects, isLoading: featuredLoading } = useFeaturedProjects();
 
     return (
         <div className="min-h-screen bg-black">
@@ -134,17 +60,25 @@ export default function ProjectsPage() {
                             </h2>
                         </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-                            {projectCategories.map((category, index) => (
-                                <ProjectCard
-                                    key={index}
-                                    variant="default"
-                                    title={category.title}
-                                    image={category.image}
-                                    link={category.link}
-                                />
-                            ))}
-                        </div>
+                        {featuredLoading ? (
+                            <div className="flex justify-center py-12">
+                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+                            </div>
+                        ) : !featuredProjects?.length ? (
+                            <p className="text-white/70 text-center py-8">No featured projects yet.</p>
+                        ) : (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+                                {featuredProjects.map((project) => (
+                                    <ProjectCard
+                                        key={project.id}
+                                        variant="default"
+                                        title={project.title}
+                                        image={project.hero_image_url || '/square1.png'}
+                                        link={`/projects/${project.slug}`}
+                                    />
+                                ))}
+                            </div>
+                        )}
                     </div>
                 </div>
             </section>
@@ -158,20 +92,30 @@ export default function ProjectsPage() {
                         </h2>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {allProjects.map((project) => (
-                            <DetailedProjectCard
-                                key={project.id}
-                                variant="default"
-                                id={project.id}
-                                title={project.title}
-                                category={project.category}
-                                description={project.description}
-                                image={project.image}
-                                link={project.link}
-                            />
-                        ))}
-                    </div>
+                    {isLoading ? (
+                        <div className="flex justify-center py-12">
+                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purdue-gold"></div>
+                        </div>
+                    ) : error ? (
+                        <p className="text-red-500 text-center py-8">Failed to load projects.</p>
+                    ) : projects?.length === 0 ? (
+                        <p className="text-gray-500 text-center py-8">No projects available yet.</p>
+                    ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {projects?.map((project) => (
+                                <DetailedProjectCard
+                                    key={project.id}
+                                    variant="default"
+                                    id={project.id}
+                                    title={project.title}
+                                    category={project.category?.name?.toUpperCase() ?? 'PROJECT'}
+                                    description={project.description ?? ''}
+                                    image={project.hero_image_url || '/square1.png'}
+                                    link={`/projects/${project.slug}`}
+                                />
+                            ))}
+                        </div>
+                    )}
                 </div>
             </section>
         </div>

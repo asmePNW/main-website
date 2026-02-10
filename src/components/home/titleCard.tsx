@@ -20,7 +20,8 @@ export default function TitleCard() {
             {/* Overlay for better text readability */}
             <div className="absolute top-0 left-0 w-full h-full bg-black/50 z-10"/> {/* Content */}
             <div className="pb-20 h-full">
-                <section className="flex h-full justify-center items-center w-full relative z-20 ">
+                <section
+                    className="flex h-full justify-center items-center w-full relative z-20 ">
                     <div className="max-w-2xl">
                         <TypingText
                             text={["DESIGN. BUILD. INSPIRE.", "THINK. SOLVE. ACHIEVE.", "INNOVATE. COLLABORATE. LEAD."]}
@@ -34,18 +35,17 @@ export default function TitleCard() {
                             max: 120
                         }}/>
                         <p className="text-4xl text-yellow-400 mb-8">
-                           Purdue Northwest ASME Student Chapter
+                            Purdue Northwest ASME Student Chapter
                         </p>
 
                         <div className="flex justify-center gap-4">
-                            <Link href="https://mypnwlife.pnw.edu/ASME/club_signup">
-                                <Button className="hover:text-black hover:bg-white">Join Us!</Button>
-                            </Link>
-                            <ScrollButton 
-                                variant="outline" 
-                                className="hover:text-white hover:bg-black"
-                                targetId="mission"
-                            >
+                            <Button className="hover:text-black hover:bg-white text-xl p-6">
+                                <Link href="https://mypnwlife.pnw.edu/ASME/club_signup">Join Us!</Link>
+                            </Button>
+                            <ScrollButton
+                                variant="outline"
+                                className="hover:text-white hover:bg-black text-xl p-6"
+                                targetId="mission">
                                 Learn More
                             </ScrollButton>
                         </div>

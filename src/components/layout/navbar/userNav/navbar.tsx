@@ -8,7 +8,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome"
 import {faBars, faXmark} from "@fortawesome/free-solid-svg-icons"
 import {Button} from '@/components/ui/buttons/Button'
 import {NAV_LINKS} from "@/config/routes"
-import ASMEPNWLogo from "../../../../public/ASMEPNWLogo.png";
+import ASMEPNWLogo from "../../../../../public/ASMEPNWLogo.png";
 
 export function Navbar() {
     const [open,
@@ -48,9 +48,8 @@ export function Navbar() {
                 {/* Desktop links - Center */}
                 <div className="hidden md:flex items-center gap-2 lg:gap-4 xl:gap-6 flex-1 justify-center">
                     {links.map((link) => (
-                        <Link key={link.name} href={link.href}>
+                        <Link key={link.name} href={link.href} className="cursor-pointer">
                             <Button
-                                key={link.name}
                                 variant="ghost"
                                 size="md"
                                 className="text-black text-lg lg:text-md hover:text-foreground whitespace-nowrap">
@@ -61,7 +60,7 @@ export function Navbar() {
                 </div>
 
                 <div className="hidden md:block shrink-0">
-                    <Link href="https://mypnwlife.pnw.edu/ASME/club_signup">
+                    <Link href="https://mypnwlife.pnw.edu/ASME/club_signup" className="cursor-pointer">
                         <Button className="hover:bg-gray-200 hover:text-black text-md " variant="default" size="sm">
                             Join Us
                         </Button>
@@ -86,9 +85,8 @@ export function Navbar() {
                 <div
                     className="md:hidden flex flex-col items-center gap-4 pb-6 bg-white border-t">
                     {links.map((link) => (
-                        <Link href={link.href}>
+                        <Link key={link.name} href={link.href} className="cursor-pointer">
                             <Button
-                                key={link.name}
                                 variant="ghost"
                                 size="default"
                                 onClick={() => setOpen(false)}>
@@ -96,7 +94,7 @@ export function Navbar() {
                             </Button>
                         </Link>
                     ))}
-                    <Link href={NAV_LINKS.JOIN}>
+                    <Link href={NAV_LINKS.JOIN} className="cursor-pointer">
                         <Button variant="default" size="default" onClick={() => setOpen(false)}>
                             Join Us
                         </Button>
