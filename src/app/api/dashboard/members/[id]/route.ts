@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { z } from 'zod'
 
 const updateMemberSchema = z.object({
@@ -123,18 +124,41 @@ export async function DELETE(
             )
         }
 
-        // Delete the profile (this will cascade to auth.users if set up)
-        const { error } = await supabase
+        // Get the member's email before deletion
+        const { data: memberProfile } = await supabase
             .from('profiles')
-            .delete()
+            .select('email')
             .eq('id', id)
+            .single()
 
-        if (error) {
-            console.error('Error deleting member:', error)
+        if (!memberProfile) {
+            return NextResponse.json(
+                { error: 'Member not found' },
+                { status: 404 }
+            )
+        }
+
+        // Use admin client to delete the auth user (cascades to profile)
+        const adminClient = createAdminClient()
+        const { error: authDeleteError } = await adminClient.auth.admin.deleteUser(id)
+
+        if (authDeleteError) {
+            console.error('Error deleting auth user:', authDeleteError)
             return NextResponse.json(
                 { error: 'Failed to remove member' },
                 { status: 500 }
             )
+        }
+
+        // Delete any pending invites for this email
+        const { error: inviteDeleteError } = await adminClient
+            .from('invites')
+            .delete()
+            .eq('email', memberProfile.email)
+
+        if (inviteDeleteError) {
+            console.error('Error deleting invites:', inviteDeleteError)
+            // Don't fail the request, just log the error
         }
 
         return NextResponse.json({ success: true })
