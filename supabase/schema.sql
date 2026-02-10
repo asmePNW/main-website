@@ -300,6 +300,7 @@ CREATE TABLE audit_logs (
 -- Enable RLS on all tables
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE contact_submissions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE invites ENABLE ROW LEVEL SECURITY;
 ALTER TABLE past_presidents ENABLE ROW LEVEL SECURITY;
 ALTER TABLE project_categories ENABLE ROW LEVEL SECURITY;
 ALTER TABLE article_categories ENABLE ROW LEVEL SECURITY;
@@ -388,6 +389,45 @@ CREATE POLICY "Admins and officers can update contact submissions"
 -- Only admins can delete
 CREATE POLICY "Admins can delete contact submissions"
   ON contact_submissions FOR DELETE
+  USING (
+    EXISTS (
+      SELECT 1 FROM profiles
+      WHERE id = auth.uid() AND role = 'admin'
+    )
+  );
+
+-- =============================================
+-- INVITES POLICIES
+-- =============================================
+
+-- Anyone can view an invite by token (for signup flow)
+CREATE POLICY "Anyone can view invite by token"
+  ON invites FOR SELECT
+  USING (true);
+
+-- Admins can create invites
+CREATE POLICY "Admins can create invites"
+  ON invites FOR INSERT
+  WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM profiles
+      WHERE id = auth.uid() AND role = 'admin'
+    )
+  );
+
+-- Admins can update invites
+CREATE POLICY "Admins can update invites"
+  ON invites FOR UPDATE
+  USING (
+    EXISTS (
+      SELECT 1 FROM profiles
+      WHERE id = auth.uid() AND role = 'admin'
+    )
+  );
+
+-- Admins can delete invites
+CREATE POLICY "Admins can delete invites"
+  ON invites FOR DELETE
   USING (
     EXISTS (
       SELECT 1 FROM profiles

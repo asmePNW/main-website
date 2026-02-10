@@ -161,6 +161,8 @@ export default function MembersPage() {
     const [inviteEmail, setInviteEmail] = useState('')
     const [inviteRole, setInviteRole] = useState<UserRole>('officer')
     const [copiedId, setCopiedId] = useState<string | null>(null)
+    const [createdInvite, setCreatedInvite] = useState<Invite | null>(null)
+    const [linkCopied, setLinkCopied] = useState(false)
 
     // Queries
     const { data: members, isLoading: loadingMembers, refetch: refetchMembers } = useQuery({
@@ -176,17 +178,31 @@ export default function MembersPage() {
     // Mutations
     const sendInviteMutation = useMutation({
         mutationFn: sendInvite,
-        onSuccess: () => {
+        onSuccess: (invite) => {
             queryClient.invalidateQueries({ queryKey: ['invites'] })
-            setShowInviteModal(false)
-            setInviteEmail('')
-            setInviteRole('officer')
-            showToast('Invite sent successfully!', 'success')
+            setCreatedInvite(invite)
+            setLinkCopied(false)
         },
         onError: (error: Error) => {
             showToast(error.message, 'error')
         },
     })
+
+    const handleCloseInviteModal = () => {
+        setShowInviteModal(false)
+        setInviteEmail('')
+        setInviteRole('officer')
+        setCreatedInvite(null)
+        setLinkCopied(false)
+    }
+
+    const handleCopyInviteLink = async () => {
+        if (createdInvite?.invite_url) {
+            await navigator.clipboard.writeText(createdInvite.invite_url)
+            setLinkCopied(true)
+            showToast('Invite link copied!', 'success')
+        }
+    }
 
     const deleteInviteMutation = useMutation({
         mutationFn: deleteInvite,
@@ -391,59 +407,111 @@ export default function MembersPage() {
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
                     <div className="bg-white rounded-xl shadow-lg w-full max-w-md mx-4">
                         <div className="flex items-center justify-between p-4 border-b border-gray-100">
-                            <h3 className="font-semibold text-gray-900">Invite New Member</h3>
+                            <h3 className="font-semibold text-gray-900">
+                                {createdInvite ? 'Invite Sent!' : 'Invite New Member'}
+                            </h3>
                             <button
-                                onClick={() => setShowInviteModal(false)}
+                                onClick={handleCloseInviteModal}
                                 className="p-1 hover:bg-gray-100 rounded-lg"
                             >
                                 <X className="h-5 w-5 text-gray-500" />
                             </button>
                         </div>
-                        <form onSubmit={handleSendInvite} className="p-4 space-y-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="invite-email">Email Address</Label>
-                                <Input
-                                    id="invite-email"
-                                    type="email"
-                                    placeholder="member@example.com"
-                                    value={inviteEmail}
-                                    onChange={(e) => setInviteEmail(e.target.value)}
-                                    required
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="invite-role">Role</Label>
-                                <select
-                                    id="invite-role"
-                                    value={inviteRole}
-                                    onChange={(e) => setInviteRole(e.target.value as UserRole)}
-                                    className="w-full border border-gray-200 rounded-lg px-3 py-2"
-                                >
-                                    <option value="officer">Officer</option>
-                                    <option value="admin">Admin</option>
-                                </select>
-                                <p className="text-xs text-gray-500">
-                                    Officers can manage content. Admins can also manage team members.
-                                </p>
-                            </div>
-                            <div className="flex gap-2 pt-2">
+                        
+                        {createdInvite ? (
+                            <div className="p-4 space-y-4">
+                                <div className="text-center space-y-2">
+                                    <div className="mx-auto w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                                        <Check className="h-6 w-6 text-green-600" />
+                                    </div>
+                                    <p className="text-gray-600">
+                                        Invite created for <span className="font-medium">{createdInvite.email}</span>
+                                    </p>
+                                </div>
+                                
+                                {createdInvite.invite_url && (
+                                    <div className="space-y-2">
+                                        <Label>Invite Link</Label>
+                                        <div className="flex gap-2">
+                                            <Input
+                                                readOnly
+                                                value={createdInvite.invite_url}
+                                                className="flex-1 text-sm bg-gray-50"
+                                            />
+                                            <Button
+                                                type="button"
+                                                variant={linkCopied ? 'outline' : 'default'}
+                                                onClick={handleCopyInviteLink}
+                                                className="shrink-0"
+                                            >
+                                                {linkCopied ? (
+                                                    <><Check className="h-4 w-4 mr-1" /> Copied</>
+                                                ) : (
+                                                    <><Copy className="h-4 w-4 mr-1" /> Copy</>
+                                                )}
+                                            </Button>
+                                        </div>
+                                        <p className="text-xs text-gray-500">
+                                            Share this link with the invitee to let them join.
+                                        </p>
+                                    </div>
+                                )}
+                                
                                 <Button
                                     type="button"
-                                    variant="outline"
-                                    className="flex-1"
-                                    onClick={() => setShowInviteModal(false)}
+                                    className="w-full"
+                                    onClick={handleCloseInviteModal}
                                 >
-                                    Cancel
-                                </Button>
-                                <Button
-                                    type="submit"
-                                    className="flex-1"
-                                    disabled={sendInviteMutation.isPending}
-                                >
-                                    {sendInviteMutation.isPending ? 'Sending...' : 'Send Invite'}
+                                    Done
                                 </Button>
                             </div>
-                        </form>
+                        ) : (
+                            <form onSubmit={handleSendInvite} className="p-4 space-y-4">
+                                <div className="space-y-2">
+                                    <Label htmlFor="invite-email">Email Address</Label>
+                                    <Input
+                                        id="invite-email"
+                                        type="email"
+                                        placeholder="member@example.com"
+                                        value={inviteEmail}
+                                        onChange={(e) => setInviteEmail(e.target.value)}
+                                        required
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="invite-role">Role</Label>
+                                    <select
+                                        id="invite-role"
+                                        value={inviteRole}
+                                        onChange={(e) => setInviteRole(e.target.value as UserRole)}
+                                        className="w-full border border-gray-200 rounded-lg px-3 py-2"
+                                    >
+                                        <option value="officer">Officer</option>
+                                        <option value="admin">Admin</option>
+                                    </select>
+                                    <p className="text-xs text-gray-500">
+                                        Officers can manage content. Admins can also manage team members.
+                                    </p>
+                                </div>
+                                <div className="flex gap-2 pt-2">
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        className="flex-1"
+                                        onClick={handleCloseInviteModal}
+                                    >
+                                        Cancel
+                                    </Button>
+                                    <Button
+                                        type="submit"
+                                        className="flex-1"
+                                        disabled={sendInviteMutation.isPending}
+                                    >
+                                        {sendInviteMutation.isPending ? 'Creating...' : 'Create Invite'}
+                                    </Button>
+                                </div>
+                            </form>
+                        )}
                     </div>
                 </div>
             )}

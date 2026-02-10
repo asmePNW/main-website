@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { createAdminClient } from '@/lib/supabase/admin'
 import { z } from 'zod'
 
 const createInviteSchema = z.object({
@@ -55,7 +54,7 @@ export async function GET() {
         }
 
         // Add invite URLs
-        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000' || 'https://asmepnw.com'
         const invitesWithUrls = data.map(invite => ({
             ...invite,
             invite_url: `${baseUrl}/invites?token=${invite.token}`,
@@ -141,33 +140,16 @@ export async function POST(request: NextRequest) {
             )
         }
 
-        // Use Supabase Admin to send invite email
-        const adminClient = createAdminClient()
-        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
-        
-        const { data: authData, error: inviteError } = await adminClient.auth.admin.inviteUserByEmail(email, {
-            redirectTo: `${baseUrl}/invites`,
-            data: {
-                role: role, // Store role in user metadata
-            },
-        })
+        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000' || 'https://asmepnw.com'
 
-        if (inviteError) {
-            console.error('Error sending invite:', inviteError)
-            return NextResponse.json(
-                { error: inviteError.message || 'Failed to send invite' },
-                { status: 500 }
-            )
-        }
-
-        // Generate a token for our tracking
+        // Generate a token for the invite link
         const token = crypto.randomUUID()
         
         // Set expiry to 7 days from now
         const expiresAt = new Date()
         expiresAt.setDate(expiresAt.getDate() + 7)
 
-        // Create the invite record for tracking
+        // Create the invite record
         const { data: invite, error } = await supabase
             .from('invites')
             .insert({
@@ -183,17 +165,26 @@ export async function POST(request: NextRequest) {
 
         if (error) {
             console.error('Error creating invite record:', error)
-            // Still return success since the Supabase invite was sent
+            return NextResponse.json(
+                { error: 'Failed to create invite' },
+                { status: 500 }
+            )
+        }
+
+        // Include invite URL in response
+        const inviteWithUrl = {
+            ...invite,
+            invite_url: `${baseUrl}/invites?token=${token}`,
         }
 
         return NextResponse.json({ 
-            data: invite || { email, role, status: 'pending' },
-            message: 'Invite email sent successfully'
+            data: inviteWithUrl,
+            message: 'Invite created successfully'
         }, { status: 201 })
     } catch (error) {
-        console.error('Unexpected error:', error)
+        console.error('Unexpected error in POST /api/dashboard/invites:', error)
         return NextResponse.json(
-            { error: 'Internal server error' },
+            { error: error instanceof Error ? error.message : 'Internal server error' },
             { status: 500 }
         )
     }

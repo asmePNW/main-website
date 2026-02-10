@@ -1,14 +1,13 @@
 "use client"
 
 import { useState, useEffect, Suspense } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/buttons/Button'
 import { Input } from '@/components/ui/Input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/cards/card'
 import { Toast, useToast } from '@/components/ui/toast'
 import { CheckCircle, AlertCircle, Loader2, Shield, ShieldCheck } from 'lucide-react'
-import { createClient } from '@/lib/supabase/client'
 
 interface InviteData {
     email: string
@@ -17,12 +16,13 @@ interface InviteData {
 
 function InviteContent() {
     const router = useRouter()
+    const searchParams = useSearchParams()
     const { toast, showToast, hideToast } = useToast()
-    const supabase = createClient()
 
     const [inviteData, setInviteData] = useState<InviteData | null>(null)
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
+    const [token, setToken] = useState<string | null>(null)
 
     const [fullName, setFullName] = useState('')
     const [password, setPassword] = useState('')
@@ -30,63 +30,39 @@ function InviteContent() {
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [success, setSuccess] = useState(false)
 
-    // Handle Supabase invite callback
+    // Fetch invite data from token
     useEffect(() => {
-        async function handleInvite() {
-            // Check if there's a session from Supabase invite
-            const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+        async function fetchInvite() {
+            const tokenParam = searchParams.get('token')
             
-            if (session?.user) {
-                // User already has a session from the invite link
-                const userMeta = session.user.user_metadata
-                setInviteData({
-                    email: session.user.email || '',
-                    role: userMeta?.role || 'officer',
-                })
+            if (!tokenParam) {
+                setError('No invite token provided. Please use the link sent to you.')
                 setLoading(false)
                 return
             }
 
-            // Check URL hash for tokens (Supabase invite flow)
-            const hash = window.location.hash
-            if (hash) {
-                const params = new URLSearchParams(hash.substring(1))
-                const accessToken = params.get('access_token')
-                const refreshToken = params.get('refresh_token')
-                const type = params.get('type')
+            setToken(tokenParam)
 
-                if (accessToken && type === 'invite') {
-                    // Exchange tokens for session
-                    const { data, error } = await supabase.auth.setSession({
-                        access_token: accessToken,
-                        refresh_token: refreshToken || '',
-                    })
+            try {
+                const response = await fetch(`/api/invites?token=${tokenParam}`)
+                const result = await response.json()
 
-                    if (error) {
-                        setError('Failed to process invite: ' + error.message)
-                        setLoading(false)
-                        return
-                    }
-
-                    if (data.user) {
-                        const userMeta = data.user.user_metadata
-                        setInviteData({
-                            email: data.user.email || '',
-                            role: userMeta?.role || 'officer',
-                        })
-                        setLoading(false)
-                        return
-                    }
+                if (!response.ok) {
+                    setError(result.error || 'Invalid or expired invite')
+                    setLoading(false)
+                    return
                 }
-            }
 
-            // No valid invite found
-            setError('Invalid or expired invite link. Please request a new invite.')
-            setLoading(false)
+                setInviteData(result.data)
+                setLoading(false)
+            } catch {
+                setError('Failed to validate invite. Please try again.')
+                setLoading(false)
+            }
         }
 
-        handleInvite()
-    }, [supabase.auth])
+        fetchInvite()
+    }, [searchParams])
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -104,43 +80,28 @@ function InviteContent() {
         setIsSubmitting(true)
 
         try {
-            // Update password
-            const { error: updateError } = await supabase.auth.updateUser({
-                password,
-                data: {
+            const response = await fetch('/api/invites', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    token,
+                    password,
                     full_name: fullName.trim() || null,
-                },
+                }),
             })
 
-            if (updateError) {
-                showToast(updateError.message, 'error')
+            const result = await response.json()
+
+            if (!response.ok) {
+                showToast(result.error || 'Failed to create account', 'error')
                 setIsSubmitting(false)
                 return
             }
 
-            // Update profile with role
-            const { data: { user } } = await supabase.auth.getUser()
-            if (user) {
-                await supabase
-                    .from('profiles')
-                    .update({ 
-                        role: inviteData?.role || 'officer',
-                        full_name: fullName.trim() || null,
-                    })
-                    .eq('id', user.id)
-
-                // Mark invite as accepted in our tracking table
-                await supabase
-                    .from('invites')
-                    .update({ status: 'accepted' })
-                    .eq('email', user.email)
-                    .eq('status', 'pending')
-            }
-
             setSuccess(true)
-            showToast('Account setup complete!', 'success')
+            showToast('Account created successfully!', 'success')
             setTimeout(() => {
-                router.push('/dashboard')
+                router.push('/login')
             }, 2000)
         } catch {
             showToast('An unexpected error occurred', 'error')
@@ -155,7 +116,7 @@ function InviteContent() {
             <div className="min-h-screen flex items-center justify-center bg-gray-50">
                 <div className="text-center">
                     <Loader2 className="h-8 w-8 animate-spin text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-500">Setting up your account...</p>
+                    <p className="text-gray-500">Validating your invite...</p>
                 </div>
             </div>
         )
