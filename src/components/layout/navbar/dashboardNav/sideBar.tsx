@@ -4,7 +4,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/buttons/Button"
-import { Home, FolderKanban, MessageSquare, Heart, LogOut } from "lucide-react"
+import { Home, FolderKanban, MessageSquare, Heart, LogOut, Users } from "lucide-react"
 import { DASHBOARD_ROUTES } from "@/config/routes"
 import { logout } from "@/components/actions/logout"
 
@@ -32,6 +32,12 @@ const navigation = [
         href: DASHBOARD_ROUTES.SPONSORS,
         icon: Heart,
         description: "Manage sponsors"
+    },
+    {
+        name: "Members",
+        href: DASHBOARD_ROUTES.MEMBERS,
+        icon: Users,
+        description: "Team members & invites"
     }
 ]
 

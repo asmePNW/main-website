@@ -3,6 +3,7 @@ export const DASHBOARD_ROUTES = {
     PROJECTS: '/dashboard/projects',
     INQUIRIES: '/dashboard/inquiries',
     SPONSORS: '/dashboard/sponsors',
+    MEMBERS: '/dashboard/members',
     TEAM: '/dashboard/teams',
     EVENTS: '/dashboard/events'
 }

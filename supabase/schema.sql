@@ -56,6 +56,28 @@ CREATE TRIGGER update_profiles_updated_at BEFORE UPDATE ON profiles
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- =============================================
+-- INVITES TABLE
+-- =============================================
+
+-- Invite status enum
+CREATE TYPE invite_status AS ENUM ('pending', 'accepted', 'expired');
+
+CREATE TABLE invites (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  email TEXT NOT NULL,
+  role user_role DEFAULT 'officer',
+  token TEXT UNIQUE NOT NULL,
+  status invite_status DEFAULT 'pending',
+  invited_by UUID REFERENCES profiles(id) ON DELETE SET NULL,
+  expires_at TIMESTAMPTZ NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TRIGGER update_invites_updated_at BEFORE UPDATE ON invites
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- =============================================
 -- CONTACT US TABLE
 -- =============================================
 

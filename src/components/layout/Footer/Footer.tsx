@@ -33,15 +33,11 @@ export function Footer() {
                                 </Link>
                             </li>
                             <li>
-                                <Link href="/contact" className="text-gray-300 hover:text-white transition-colors">
+                                <Link href="https://maps.app.goo.gl/k14gbXdnBNMe43Hq7" className="text-gray-300 hover:text-white transition-colors">
                                     Location
                                 </Link>
                             </li>
-                            <li>
-                                <Link href="/events" className="text-gray-300 hover:text-white transition-colors">
-                                    Schedule
-                                </Link>
-                            </li>
+                           
                         </ul>
                     </div>
 
@@ -50,18 +46,29 @@ export function Footer() {
                         <h3 className="font-semibold text-gray-100 mb-3">Quick Links</h3>
                         <ul className="space-y-2 text-sm">
                             <li>
-                                <Link href="/about" className="text-gray-300 hover:text-white transition-colors">
-                                    About
+                                <Link href="/home" className="text-gray-300 hover:text-white transition-colors">
+                                    Home
                                 </Link>
                             </li>
                             <li>
-                                <Link href="/events" className="text-gray-300 hover:text-white transition-colors">
+                                <Link href="/Projects" className="text-gray-300 hover:text-white transition-colors">
+                                    Projects
+                                </Link>
+                            </li>
+                            <li>
+                                <Link href="/Team" className="text-gray-300 hover:text-white transition-colors">
+                                    Team
+                                </Link>
+                            </li>
+                            <li>  
+                                <Link href="/Events" className="text-gray-300 hover:text-white transition-colors">
                                     Events
                                 </Link>
-                            </li>
+                                </li>  
+                                
                             <li>
-                                <Link href="/projects" className="text-gray-300 hover:text-white transition-colors">
-                                    Projects
+                                <Link href="/contact" className="text-gray-300 hover:text-white transition-colors">
+                                    Contact
                                 </Link>
                             </li>
                         </ul>
@@ -71,21 +78,21 @@ export function Footer() {
                     <div>
                         <h3 className="font-semibold text-gray-100 mb-3">Connect</h3>
                         <ul className="space-y-2 text-sm">
-                            <li>
+                            {/* <li>
                                 <Link href="https://facebook.com" target="_blank" className="text-gray-300 hover:text-white transition-colors">
                                     Facebook
                                 </Link>
-                            </li>
+                            </li> */}
                             <li>
                                 <Link href="https://instagram.com/asme_pnw" target="_blank" className="text-gray-300 hover:text-white transition-colors">
                                     Instagram
                                 </Link>
                             </li>
-                            <li>
+                            {/* <li>
                                 <Link href="https://linkedin.com" target="_blank" className="text-gray-300 hover:text-white transition-colors">
                                     LinkedIn
                                 </Link>
-                            </li>
+                            </li> */}
                         </ul>
                     </div>
                 </div>
@@ -96,12 +103,12 @@ export function Footer() {
                         <Link href="https://instagram.com/asme_pnw" target="_blank" aria-label="Instagram" className="hover:text-white transition-colors">
                             <FontAwesomeIcon icon={faInstagram} className="h-5 w-5"/>
                         </Link>
-                        <Link href="https://linkedin.com" target="_blank" aria-label="LinkedIn" className="hover:text-white transition-colors">
+                        {/* <Link href="https://linkedin.com" target="_blank" aria-label="LinkedIn" className="hover:text-white transition-colors">
                             <FontAwesomeIcon icon={faLinkedin} className="h-5 w-5"/>
                         </Link>
                         <Link href="https://x.com" target="_blank" aria-label="X" className="hover:text-white transition-colors">
                             <FontAwesomeIcon icon={faXTwitter} className="h-5 w-5"/>
-                        </Link>
+                        </Link> */}
                     </div>
                     <Button variant="default" className="text-gray-300 hover:text-white transition-colors">
                         <Link href="/login">Admin Login</Link>
