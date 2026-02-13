@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from 'react'
-import { RefreshCw, Plus, Trash2, Heart } from 'lucide-react'
+import { RefreshCw, Plus, Trash2, Heart, ExternalLink } from 'lucide-react'
 import { Button } from '@/components/ui/buttons/Button'
 import ImageUploader, { uploadImageToBucket } from '@/components/ui/ImageUploader'
 import { useSponsors, useCreateSponsor, useUpdateSponsor, useDeleteSponsor } from '@/hooks/useProjects'
@@ -22,8 +22,8 @@ export default function SponsorsPage() {
 
     const [showCreate, setShowCreate] = useState(false)
     const [editingId, setEditingId] = useState<string | null>(null)
-    const [newSponsor, setNewSponsor] = useState({ name: '', logo_url: '', tier: 'gold' as SponsorTier, description: '', order_index: '' })
-    const [editSponsor, setEditSponsor] = useState({ name: '', logo_url: '', tier: 'gold' as SponsorTier, description: '', order_index: '' })
+    const [newSponsor, setNewSponsor] = useState({ name: '', logo_url: '', tier: 'gold' as SponsorTier, description: '', order_index: '', link: '' })
+    const [editSponsor, setEditSponsor] = useState({ name: '', logo_url: '', tier: 'gold' as SponsorTier, description: '', order_index: '', link: '' })
     const [pendingLogo, setPendingLogo] = useState<File | null>(null)
     const [editPendingLogo, setEditPendingLogo] = useState<File | null>(null)
     const [isSaving, setIsSaving] = useState(false)
@@ -48,11 +48,12 @@ export default function SponsorsPage() {
                 name: newSponsor.name,
                 tier: newSponsor.tier,
                 logo_url: logoUrl || undefined,
+                link: newSponsor.link || undefined,
                 description: newSponsor.description || undefined,
                 order_index: newSponsor.order_index ? parseInt(newSponsor.order_index) : undefined,
             })
             setShowCreate(false)
-            setNewSponsor({ name: '', logo_url: '', tier: 'gold', description: '', order_index: '' })
+            setNewSponsor({ name: '', logo_url: '', tier: 'gold', description: '', order_index: '', link: '' })
             setPendingLogo(null)
         } finally {
             setIsSaving(false)
@@ -72,13 +73,14 @@ export default function SponsorsPage() {
             tier: sponsor.tier,
             description: sponsor.description || '',
             order_index: sponsor.order_index?.toString() || '',
+            link: sponsor.link || '',
         })
         setEditPendingLogo(null)
     }
 
     const handleStopEditing = () => {
         setEditingId(null)
-        setEditSponsor({ name: '', logo_url: '', tier: 'gold', description: '', order_index: '' })
+        setEditSponsor({ name: '', logo_url: '', tier: 'gold', description: '', order_index: '', link: '' })
         setEditPendingLogo(null)
     }
 
@@ -96,6 +98,7 @@ export default function SponsorsPage() {
                     name: editSponsor.name,
                     tier: editSponsor.tier,
                     logo_url: logoUrl || undefined,
+                    link: editSponsor.link || undefined,
                     description: editSponsor.description || undefined,
                     order_index: editSponsor.order_index ? parseInt(editSponsor.order_index) : undefined,
                 },
@@ -179,6 +182,11 @@ export default function SponsorsPage() {
                                                     {sponsor.order_index !== null && (
                                                         <span className="text-xs text-gray-400">#{sponsor.order_index}</span>
                                                     )}
+                                                    {sponsor.link && (
+                                                        <a href={sponsor.link} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-700">
+                                                            <ExternalLink className="h-3 w-3" />
+                                                        </a>
+                                                    )}
                                                 </div>
                                             </div>
                                             <div className="border-t border-gray-100 px-4 py-2 bg-gray-50 flex justify-between">
@@ -255,6 +263,16 @@ export default function SponsorsPage() {
                                 />
                             </div>
                             <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Link</label>
+                                <input
+                                    type="url"
+                                    value={newSponsor.link}
+                                    onChange={(e) => setNewSponsor({ ...newSponsor, link: e.target.value })}
+                                    className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                                    placeholder="https://sponsor-website.com"
+                                />
+                            </div>
+                            <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Order Index</label>
                                 <input
                                     type="number"
@@ -265,7 +283,7 @@ export default function SponsorsPage() {
                                 />
                             </div>
                             <div className="flex gap-2 justify-end">
-                                <Button type="button" variant="outline" onClick={() => { setShowCreate(false); setNewSponsor({ name: '', logo_url: '', tier: 'gold', description: '', order_index: '' }); setPendingLogo(null) }}>Cancel</Button>
+                                <Button type="button" variant="outline" onClick={() => { setShowCreate(false); setNewSponsor({ name: '', logo_url: '', tier: 'gold', description: '', order_index: '', link: '' }); setPendingLogo(null) }}>Cancel</Button>
                                 <Button type="submit" disabled={createMutation.isPending || isSaving}>
                                     {isSaving ? 'Adding...' : 'Add Sponsor'}
                                 </Button>
@@ -323,6 +341,16 @@ export default function SponsorsPage() {
                                     className="w-full border border-gray-300 rounded-lg px-3 py-2"
                                     rows={3}
                                     placeholder="Optional description"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Link</label>
+                                <input
+                                    type="url"
+                                    value={editSponsor.link}
+                                    onChange={(e) => setEditSponsor({ ...editSponsor, link: e.target.value })}
+                                    className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                                    placeholder="https://sponsor-website.com"
                                 />
                             </div>
                             <div>

@@ -37,9 +37,20 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
             )
         }
 
-        const updateData = {
-            ...validationResult.data,
-            logo_url: validationResult.data.logo_url || null,
+        const updateData: Record<string, unknown> = {
+            name: validationResult.data.name,
+            tier: validationResult.data.tier,
+            description: validationResult.data.description,
+            order_index: validationResult.data.order_index,
+        }
+        
+        // Only set fields if they were explicitly provided
+        if ('logo_url' in validationResult.data) {
+            updateData.logo_url = validationResult.data.logo_url || null
+        }
+        // Map 'link' to database column 'Link'
+        if ('link' in validationResult.data) {
+            updateData.Link = validationResult.data.link || null
         }
 
         const { data, error } = await supabase
@@ -54,7 +65,14 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
             return NextResponse.json({ error: 'Failed to update sponsor' }, { status: 500 })
         }
 
-        return NextResponse.json({ data })
+        // Transform 'Link' column to 'link' for frontend consistency
+        const transformedData = {
+            ...data,
+            link: data.Link ?? null,
+            Link: undefined,
+        }
+
+        return NextResponse.json({ data: transformedData })
     } catch (error) {
         console.error('Unexpected error:', error)
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 })

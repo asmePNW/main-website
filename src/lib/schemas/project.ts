@@ -263,6 +263,7 @@ export const sponsorSchema = z.object({
     id: z.string().uuid(),
     name: z.string(),
     logo_url: z.string().nullable(),
+    link: z.string().nullable(),
     tier: sponsorTierSchema,
     description: z.string().nullable(),
     order_index: z.number().nullable(),
@@ -274,6 +275,7 @@ export type Sponsor = z.infer<typeof sponsorSchema>
 export const createSponsorSchema = z.object({
     name: z.string().min(1, 'Name is required').max(200),
     logo_url: z.string().url().optional().or(z.literal('')),
+    link: z.string().url().optional().or(z.literal('')),
     tier: sponsorTierSchema,
     description: z.string().max(500).optional(),
     order_index: z.number().optional(),

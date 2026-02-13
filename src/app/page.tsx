@@ -4,18 +4,24 @@ import Image from 'next/image';
 import {CountingNumber} from '@/components/ui/shadcn-io/counting-number';
 import {Button} from '@/components/ui/buttons/Button';
 import Link from 'next/link';
-import {faLink} from '@fortawesome/free-solid-svg-icons';
+import {faLink, faArrowUpRightFromSquare} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import { createClient } from '@/lib/supabase/server';
 
 export default async function Home() {
     // Fetch sponsors from database
     const supabase = await createClient();
-    const { data: allSponsors } = await supabase
+    const { data: rawSponsors } = await supabase
         .from('sponsors')
         .select('*')
         .order('order_index', { ascending: true, nullsFirst: false })
         .order('name', { ascending: true });
+
+    // Transform 'Link' column to 'link' for consistency
+    const allSponsors = rawSponsors?.map(s => ({
+        ...s,
+        link: s.Link ?? null,
+    }));
 
     const sponsors = {
         platinum: allSponsors?.filter(s => s.tier === 'platinum') || [],
@@ -291,28 +297,42 @@ export default async function Home() {
                                 </span>
                             </h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 justify-items-center">
-                                {sponsors.platinum.map((sponsor) => (
-                                    <Card key={sponsor.id} className="w-full max-w-md bg-white hover:shadow-lg transition-shadow">
-                                        <CardContent className="flex flex-col items-center p-6">
-                                            {sponsor.logo_url ? (
-                                                <Image
-                                                    src={sponsor.logo_url}
-                                                    alt={sponsor.name}
-                                                    width={200}
-                                                    height={100}
-                                                    className="object-contain mb-4"/>
-                                            ) : (
-                                                <div className="w-[200px] h-[100px] bg-gray-100 rounded flex items-center justify-center mb-4">
-                                                    <span className="text-gray-400">{sponsor.name}</span>
+                                {sponsors.platinum.map((sponsor) => {
+                                    const cardContent = (
+                                        <Card key={sponsor.id} className={`w-full max-w-md bg-white hover:shadow-lg transition-shadow relative ${sponsor.link ? 'cursor-pointer' : ''}`}>
+                                            {sponsor.link && (
+                                                <div className="absolute top-3 right-3 text-gray-400">
+                                                    <FontAwesomeIcon icon={faArrowUpRightFromSquare} className="h-4 w-4" />
                                                 </div>
                                             )}
-                                            <CardTitle className="text-lg">{sponsor.name}</CardTitle>
-                                            {sponsor.description && (
-                                                <p className="text-sm text-gray-500 text-center mt-2">{sponsor.description}</p>
-                                            )}
-                                        </CardContent>
-                                    </Card>
-                                ))}
+                                            <CardContent className="flex flex-col items-center p-6">
+                                                {sponsor.logo_url ? (
+                                                    <Image
+                                                        src={sponsor.logo_url}
+                                                        alt={sponsor.name}
+                                                        width={200}
+                                                        height={100}
+                                                        className="object-contain mb-4"/>
+                                                ) : (
+                                                    <div className="w-[200px] h-[100px] bg-gray-100 rounded flex items-center justify-center mb-4">
+                                                        <span className="text-gray-400">{sponsor.name}</span>
+                                                    </div>
+                                                )}
+                                                <CardTitle className="text-lg">{sponsor.name}</CardTitle>
+                                                {sponsor.description && (
+                                                    <p className="text-sm text-gray-500 text-center mt-2">{sponsor.description}</p>
+                                                )}
+                                            </CardContent>
+                                        </Card>
+                                    );
+                                    return sponsor.link ? (
+                                        <a key={sponsor.id} href={sponsor.link} target="_blank" rel="noopener noreferrer" className="w-full max-w-md">
+                                            {cardContent}
+                                        </a>
+                                    ) : (
+                                        <div key={sponsor.id} className="w-full max-w-md">{cardContent}</div>
+                                    );
+                                })}
                             </div>
                         </div>
                     )}
@@ -327,28 +347,42 @@ export default async function Home() {
                                 </span>
                             </h3>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 justify-items-center">
-                                {sponsors.gold.map((sponsor) => (
-                                    <Card key={sponsor.id} className="w-full max-w-sm bg-white hover:shadow-lg transition-shadow border-yellow-200">
-                                        <CardContent className="flex flex-col items-center p-5">
-                                            {sponsor.logo_url ? (
-                                                <Image
-                                                    src={sponsor.logo_url}
-                                                    alt={sponsor.name}
-                                                    width={150}
-                                                    height={75}
-                                                    className="object-contain mb-3"/>
-                                            ) : (
-                                                <div className="w-[150px] h-[75px] bg-gray-100 rounded flex items-center justify-center mb-3">
-                                                    <span className="text-gray-400 text-sm">{sponsor.name}</span>
+                                {sponsors.gold.map((sponsor) => {
+                                    const cardContent = (
+                                        <Card key={sponsor.id} className={`w-full max-w-sm bg-white hover:shadow-lg transition-shadow border-yellow-200 relative ${sponsor.link ? 'cursor-pointer' : ''}`}>
+                                            {sponsor.link && (
+                                                <div className="absolute top-3 right-3 text-gray-400">
+                                                    <FontAwesomeIcon icon={faArrowUpRightFromSquare} className="h-4 w-4" />
                                                 </div>
                                             )}
-                                            <CardTitle className="text-base">{sponsor.name}</CardTitle>
-                                            {sponsor.description && (
-                                                <p className="text-xs text-gray-500 text-center mt-1 line-clamp-2">{sponsor.description}</p>
-                                            )}
-                                        </CardContent>
-                                    </Card>
-                                ))}
+                                            <CardContent className="flex flex-col items-center p-5">
+                                                {sponsor.logo_url ? (
+                                                    <Image
+                                                        src={sponsor.logo_url}
+                                                        alt={sponsor.name}
+                                                        width={150}
+                                                        height={75}
+                                                        className="object-contain mb-3"/>
+                                                ) : (
+                                                    <div className="w-[150px] h-[75px] bg-gray-100 rounded flex items-center justify-center mb-3">
+                                                        <span className="text-gray-400 text-sm">{sponsor.name}</span>
+                                                    </div>
+                                                )}
+                                                <CardTitle className="text-base">{sponsor.name}</CardTitle>
+                                                {sponsor.description && (
+                                                    <p className="text-xs text-gray-500 text-center mt-1 line-clamp-2">{sponsor.description}</p>
+                                                )}
+                                            </CardContent>
+                                        </Card>
+                                    );
+                                    return sponsor.link ? (
+                                        <a key={sponsor.id} href={sponsor.link} target="_blank" rel="noopener noreferrer" className="w-full max-w-sm">
+                                            {cardContent}
+                                        </a>
+                                    ) : (
+                                        <div key={sponsor.id} className="w-full max-w-sm">{cardContent}</div>
+                                    );
+                                })}
                             </div>
                         </div>
                     )}
@@ -363,25 +397,39 @@ export default async function Home() {
                                 </span>
                             </h3>
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 justify-items-center">
-                                {sponsors.silver.map((sponsor) => (
-                                    <Card key={sponsor.id} className="w-full bg-white hover:shadow-md transition-shadow">
-                                        <CardContent className="flex flex-col items-center p-4">
-                                            {sponsor.logo_url ? (
-                                                <Image
-                                                    src={sponsor.logo_url}
-                                                    alt={sponsor.name}
-                                                    width={120}
-                                                    height={60}
-                                                    className="object-contain mb-2"/>
-                                            ) : (
-                                                <div className="w-[120px] h-[60px] bg-gray-100 rounded flex items-center justify-center mb-2">
-                                                    <span className="text-gray-400 text-xs">{sponsor.name}</span>
+                                {sponsors.silver.map((sponsor) => {
+                                    const cardContent = (
+                                        <Card key={sponsor.id} className={`w-full bg-white hover:shadow-md transition-shadow relative ${sponsor.link ? 'cursor-pointer' : ''}`}>
+                                            {sponsor.link && (
+                                                <div className="absolute top-2 right-2 text-gray-400">
+                                                    <FontAwesomeIcon icon={faArrowUpRightFromSquare} className="h-3 w-3" />
                                                 </div>
                                             )}
-                                            <CardTitle className="text-sm">{sponsor.name}</CardTitle>
-                                        </CardContent>
-                                    </Card>
-                                ))}
+                                            <CardContent className="flex flex-col items-center p-4">
+                                                {sponsor.logo_url ? (
+                                                    <Image
+                                                        src={sponsor.logo_url}
+                                                        alt={sponsor.name}
+                                                        width={120}
+                                                        height={60}
+                                                        className="object-contain mb-2"/>
+                                                ) : (
+                                                    <div className="w-[120px] h-[60px] bg-gray-100 rounded flex items-center justify-center mb-2">
+                                                        <span className="text-gray-400 text-xs">{sponsor.name}</span>
+                                                    </div>
+                                                )}
+                                                <CardTitle className="text-sm">{sponsor.name}</CardTitle>
+                                            </CardContent>
+                                        </Card>
+                                    );
+                                    return sponsor.link ? (
+                                        <a key={sponsor.id} href={sponsor.link} target="_blank" rel="noopener noreferrer" className="w-full">
+                                            {cardContent}
+                                        </a>
+                                    ) : (
+                                        <div key={sponsor.id} className="w-full">{cardContent}</div>
+                                    );
+                                })}
                             </div>
                         </div>
                     )}
@@ -396,25 +444,39 @@ export default async function Home() {
                                 </span>
                             </h3>
                             <div className="grid grid-cols-3 md:grid-cols-6 gap-3 justify-items-center">
-                                {sponsors.bronze.map((sponsor) => (
-                                    <Card key={sponsor.id} className="w-full bg-white hover:shadow-md transition-shadow">
-                                        <CardContent className="flex flex-col items-center p-3">
-                                            {sponsor.logo_url ? (
-                                                <Image
-                                                    src={sponsor.logo_url}
-                                                    alt={sponsor.name}
-                                                    width={80}
-                                                    height={40}
-                                                    className="object-contain mb-1"/>
-                                            ) : (
-                                                <div className="w-[80px] h-[40px] bg-gray-100 rounded flex items-center justify-center mb-1">
-                                                    <span className="text-gray-400 text-[10px]">{sponsor.name}</span>
+                                {sponsors.bronze.map((sponsor) => {
+                                    const cardContent = (
+                                        <Card key={sponsor.id} className={`w-full bg-white hover:shadow-md transition-shadow relative ${sponsor.link ? 'cursor-pointer' : ''}`}>
+                                            {sponsor.link && (
+                                                <div className="absolute top-2 right-2 text-gray-400">
+                                                    <FontAwesomeIcon icon={faArrowUpRightFromSquare} className="h-2.5 w-2.5" />
                                                 </div>
                                             )}
-                                            <CardTitle className="text-xs">{sponsor.name}</CardTitle>
-                                        </CardContent>
-                                    </Card>
-                                ))}
+                                            <CardContent className="flex flex-col items-center p-3">
+                                                {sponsor.logo_url ? (
+                                                    <Image
+                                                        src={sponsor.logo_url}
+                                                        alt={sponsor.name}
+                                                        width={80}
+                                                        height={40}
+                                                        className="object-contain mb-1"/>
+                                                ) : (
+                                                    <div className="w-[80px] h-[40px] bg-gray-100 rounded flex items-center justify-center mb-1">
+                                                        <span className="text-gray-400 text-[10px]">{sponsor.name}</span>
+                                                    </div>
+                                                )}
+                                                <CardTitle className="text-xs">{sponsor.name}</CardTitle>
+                                            </CardContent>
+                                        </Card>
+                                    );
+                                    return sponsor.link ? (
+                                        <a key={sponsor.id} href={sponsor.link} target="_blank" rel="noopener noreferrer" className="w-full">
+                                            {cardContent}
+                                        </a>
+                                    ) : (
+                                        <div key={sponsor.id} className="w-full">{cardContent}</div>
+                                    );
+                                })}
                             </div>
                         </div>
                     )}
