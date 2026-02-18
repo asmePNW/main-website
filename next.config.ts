@@ -11,6 +11,10 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'tolczofmnknciizgytuv.supabase.co',
       },
+      {
+        protocol: 'https',
+        hostname: 'mypnwlife.pnw.edu',
+      },
     ],
   },
 };
