@@ -113,6 +113,18 @@ CREATE TRIGGER update_past_presidents_updated_at BEFORE UPDATE ON past_president
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- =============================================
+-- PNW EVENT NOTIFICATIONS TABLE
+-- (Tracks which events have already been notified to Discord)
+-- =============================================
+
+CREATE TABLE pnw_event_notifications (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  event_id TEXT UNIQUE NOT NULL,
+  event_name TEXT,
+  notified_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- =============================================
 -- CATEGORIES TABLES
 -- =============================================
 

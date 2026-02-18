@@ -7,6 +7,7 @@ import Link from 'next/link';
 import {faLink, faArrowUpRightFromSquare} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import { createClient } from '@/lib/supabase/server';
+import HomeEvents from '@/components/home/HomeEvents';
 
 export default async function Home() {
     // Fetch sponsors from database
@@ -16,6 +17,15 @@ export default async function Home() {
         .select('*')
         .order('order_index', { ascending: true, nullsFirst: false })
         .order('name', { ascending: true });
+
+    // Fetch projects from database
+    const { data: projects } = await supabase
+        .from('projects')
+        .select('id, title, created_at, slug')
+        .eq('status', 'published')
+        .order('order_index', { ascending: true, nullsFirst: false })
+        .order('created_at', { ascending: false })
+        .limit(6);
 
     // Transform 'Link' column to 'link' for consistency
     const allSponsors = rawSponsors?.map(s => ({
@@ -29,43 +39,6 @@ export default async function Home() {
         silver: allSponsors?.filter(s => s.tier === 'silver') || [],
         bronze: allSponsors?.filter(s => s.tier === 'bronze') || [],
     };
-
-    interface Event {
-        id : number;
-        title : string;
-        date : string;
-        location : string;
-        description : string;
-        image : string;
-    }
-
-    const events : Event[] = [
-        {
-            id: 1,
-            title: "Engineering Expo 2025",
-            date: "March 12, 2025",
-            location: "Purdue Northwest - Anderson Hall",
-            description: "Showcase your mechanical and electrical innovations at our annual expo, featurin" +
-                    "g student projects, demos, and sponsors.",
-            image: "/mission.png"
-        }, {
-            id: 2,
-            title: "ASME Design Workshop",
-            date: "April 2, 2025",
-            location: "Tech Building Room 210",
-            description: "A hands-on workshop focused on 3D modeling, CAD design, and rapid prototyping te" +
-                    "chniques for engineering projects.",
-            image: "/mission.png"
-        }, {
-            id: 3,
-            title: "Shell Eco-Marathon Team Meet",
-            date: "May 8, 2025",
-            location: "Design Lab B",
-            description: "Join us to learn how our team builds efficient BLDC-powered cars for the Shell E" +
-                    "co-Marathon competition!",
-            image: "/mission.png"
-        }
-    ];
 
     return (
         <div>
@@ -110,9 +83,9 @@ export default async function Home() {
                 </div>
 
                 {/* 3D Printing Hub - Image Left, Text Right */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center mb-16">
                     <div
-                        className="relative rounded-3xl aspect-square flex items-center justify-center overflow-hidden">
+                        className="relative rounded-3xl aspect-square flex items-center justify-center overflow-hidden order-2 md:order-1">
                         <Image src="/3dCAR.jpg" alt="3D Printing Hub" fill className="object-cover"/>
                     </div>
                     <div className="order-1 md:order-2">
@@ -148,82 +121,25 @@ export default async function Home() {
             {/* Projects List */}
             <div className="pb-30 px-[15%]">
                 <div className="space-y-0">
-                    {[
-                        {
-                            name: "Machine Redesign",
-                            year: 2026
-                        }, {
-                            name: "Solar Car",
-                            year: 2025
-                        }, {
-                            name: "Rover Team",
-                            year: 2025
-                        }, {
-                            name: "Wind Turbine",
-                            year: 2024
-                        }, {
-                            name: "3D Printing Hub",
-                            year: 2024
-                        }, {
-                            name: "Biomedical Devices",
-                            year: 2023
-                        }
-                    ].map((project, index) => (
-                        <div
-                            key={index}
-                            className="flex justify-between items-center py-4 border-b border-gray-200 hover:bg-gray-50 transition-colors cursor-pointer">
-                            <span className="text-lg font-medium text-gray-800">{project.name}</span>
-                            <span className="text-lg text-gray-500">{project.year}</span>
-                        </div>
-                    ))}
+                    {projects && projects.length > 0 ? (
+                        projects.map((project) => (
+                            <Link
+                                key={project.id}
+                                href={`/projects/${project.slug}`}
+                                className="flex justify-between items-center py-4 border-b border-gray-200 hover:bg-gray-50 transition-colors cursor-pointer">
+                                <span className="text-lg font-medium text-gray-800">{project.title}</span>
+                                <span className="text-lg text-gray-500">
+                                    {project.created_at ? new Date(project.created_at).getFullYear() : ''}
+                                </span>
+                            </Link>
+                        ))
+                    ) : (
+                        <p className="text-gray-500 text-center py-4">No projects available</p>
+                    )}
                 </div>
             </div>
 
-            <div className="bg-gray-100 py-30 px-[15%]">
-                <div>
-                    <h2 className="text-3xl font-bold text-center mb-8">Upcoming Events</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {events.map((event) => (
-                            <div
-                                key={event.id}
-                                className="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
-                                <div className="h-48 w-full overflow-hidden">
-                                    <Image
-                                        src={event.image}
-                                        alt={event.title}
-                                        width={400}
-                                        height={200}
-                                        className="object-cover w-full h-full"/>
-                                </div>
-                                <div className="p-6">
-                                    <h2 className="text-xl font-semibold mb-2 text-gray-800">
-                                        {event.title}
-                                    </h2>
-                                    <p className="text-sm text-gray-500 mb-1">
-                                        📅 {event.date}
-                                    </p>
-                                    <p className="text-sm text-gray-500 mb-3">
-                                        📍 {event.location}
-                                    </p>
-                                    {/* <p className="text-gray-700 text-sm mb-4">
-                                        {event.description}
-                                    </p> */}
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                    <div className="flex justify-center mt-8">
-                        <Link href="/events">
-                            <Button
-                                className='hover:bg-gray-300 hover:text-black'
-                                variant="default"
-                                size="lg">
-                                View All Events
-                            </Button>
-                        </Link>
-                    </div>
-                </div>
-            </div>
+            <HomeEvents />
 
             <div className="py-30 px-[15%]">
                 <section className="space-y-6">

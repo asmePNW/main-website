@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/utils/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 // ============ Constants ============
-const PNW_BASE_URL = "https://mypnwlife.pnw.edu";
+const PNW_BASE_URL = process.env.PNW_BASE_URL;
 const EVENTS_API = `${PNW_BASE_URL}/mobile_ws/v17/mobile_events_list`;
-const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1472141326568128553/eJA2sKAT6nx4ll1nY0TWeIUlRNSsPfMR5zDz_PJLztyUNp6JTQuGfn01sp6l4JzZM3ad";
+const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL;
 
 interface ParsedEvent {
   eventId: string;
@@ -41,12 +41,17 @@ function parseEvent(raw: Record<string, unknown>): ParsedEvent | null {
 }
 
 async function sendDiscordNotification(event: ParsedEvent): Promise<boolean> {
+  if (!DISCORD_WEBHOOK_URL) {
+    console.error("DISCORD_WEBHOOK_URL is not configured");
+    return false;
+  }
+
   try {
     const response = await fetch(DISCORD_WEBHOOK_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        content: "@everyone 🎉 **New ASME Event!**",
+        content: " @everyone Hey Engineers! There is a  **New ASME Event!**",
         embeds: [
           {
             title: event.eventName,
@@ -122,7 +127,7 @@ export async function GET(request: Request) {
     }
 
     // 2. Check which events we've already notified about
-    const supabase = await createClient();
+    const supabase = createAdminClient();
     const eventIds = events.map((e) => e.eventId);
 
     const { data: existingNotifications } = await supabase

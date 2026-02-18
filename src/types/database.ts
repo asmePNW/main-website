@@ -68,13 +68,14 @@ export type Database = {
       }
       articles: {
         Row: {
-          author_id: string | null
+          author_name: string
           category_id: string | null
           content: string | null
           created_at: string | null
           description: string | null
           id: string
           image_url: string | null
+          project_id: string
           published_at: string | null
           slug: string
           status: Database["public"]["Enums"]["upload_status"] | null
@@ -83,13 +84,14 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
-          author_id?: string | null
+          author_name?: string
           category_id?: string | null
           content?: string | null
           created_at?: string | null
           description?: string | null
           id?: string
           image_url?: string | null
+          project_id: string
           published_at?: string | null
           slug: string
           status?: Database["public"]["Enums"]["upload_status"] | null
@@ -98,13 +100,14 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
-          author_id?: string | null
+          author_name?: string
           category_id?: string | null
           content?: string | null
           created_at?: string | null
           description?: string | null
           id?: string
           image_url?: string | null
+          project_id?: string
           published_at?: string | null
           slug?: string
           status?: Database["public"]["Enums"]["upload_status"] | null
@@ -114,17 +117,17 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "articles_author_id_fkey"
-            columns: ["author_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "articles_category_id_fkey"
             columns: ["category_id"]
             isOneToOne: false
             referencedRelation: "article_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "articles_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
             referencedColumns: ["id"]
           },
         ]
@@ -199,6 +202,50 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      invites: {
+        Row: {
+          created_at: string | null
+          email: string
+          expires_at: string
+          id: string
+          invited_by: string | null
+          role: Database["public"]["Enums"]["user_role"] | null
+          status: Database["public"]["Enums"]["invite_status"] | null
+          token: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          expires_at: string
+          id?: string
+          invited_by?: string | null
+          role?: Database["public"]["Enums"]["user_role"] | null
+          status?: Database["public"]["Enums"]["invite_status"] | null
+          token: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          expires_at?: string
+          id?: string
+          invited_by?: string | null
+          role?: Database["public"]["Enums"]["user_role"] | null
+          status?: Database["public"]["Enums"]["invite_status"] | null
+          token?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invites_invited_by_fkey"
+            columns: ["invited_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       past_presidents: {
         Row: {
@@ -394,6 +441,7 @@ export type Database = {
           created_at: string | null
           created_by: string | null
           description: string | null
+          featured: boolean
           hero_image_url: string | null
           id: string
           order_index: number | null
@@ -407,6 +455,7 @@ export type Database = {
           created_at?: string | null
           created_by?: string | null
           description?: string | null
+          featured?: boolean
           hero_image_url?: string | null
           id?: string
           order_index?: number | null
@@ -420,6 +469,7 @@ export type Database = {
           created_at?: string | null
           created_by?: string | null
           description?: string | null
+          featured?: boolean
           hero_image_url?: string | null
           id?: string
           order_index?: number | null
@@ -445,9 +495,45 @@ export type Database = {
           },
         ]
       }
+      sponsors: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          Link: string | null
+          logo_url: string | null
+          name: string
+          order_index: number | null
+          tier: Database["public"]["Enums"]["tiers"]
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          Link?: string | null
+          logo_url?: string | null
+          name: string
+          order_index?: number | null
+          tier: Database["public"]["Enums"]["tiers"]
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          Link?: string | null
+          logo_url?: string | null
+          name?: string
+          order_index?: number | null
+          tier?: Database["public"]["Enums"]["tiers"]
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       sub_projects: {
         Row: {
-          author_id: string | null
+          author_name: string
           content: string | null
           created_at: string | null
           description: string | null
@@ -462,7 +548,7 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
-          author_id?: string | null
+          author_name?: string
           content?: string | null
           created_at?: string | null
           description?: string | null
@@ -477,7 +563,7 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
-          author_id?: string | null
+          author_name?: string
           content?: string | null
           created_at?: string | null
           description?: string | null
@@ -492,13 +578,6 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: [
-          {
-            foreignKeyName: "sub_projects_author_id_fkey"
-            columns: ["author_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "sub_projects_project_id_fkey"
             columns: ["project_id"]
@@ -547,6 +626,8 @@ export type Database = {
     }
     Enums: {
       contact_status: "new" | "in_progress" | "resolved" | "archived"
+      invite_status: "pending" | "accepted" | "expired"
+      tiers: "platinum" | "gold" | "silver" | "bronze"
       upload_status: "draft" | "published" | "archived"
       user_role: "admin" | "officer"
     }
@@ -680,6 +761,8 @@ export const Constants = {
   public: {
     Enums: {
       contact_status: ["new", "in_progress", "resolved", "archived"],
+      invite_status: ["pending", "accepted", "expired"],
+      tiers: ["platinum", "gold", "silver", "bronze"],
       upload_status: ["draft", "published", "archived"],
       user_role: ["admin", "officer"],
     },

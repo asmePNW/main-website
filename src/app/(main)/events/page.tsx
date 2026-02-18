@@ -1,43 +1,12 @@
+'use client'
+
 import Image from "next/image";
-
-interface Event {
-    id : number;
-    title : string;
-    date : string;
-    location : string;
-    description : string;
-    image : string;
-}
-
-const events : Event[] = [
-    {
-        id: 1,
-        title: "Engineering Expo 2025",
-        date: "March 12, 2025",
-        location: "Purdue Northwest - Anderson Hall",
-        description: "Showcase your mechanical and electrical innovations at our annual expo, featurin" +
-                "g student projects, demos, and sponsors.",
-        image: "/mission.png"
-    }, {
-        id: 2,
-        title: "ASME Design Workshop",
-        date: "April 2, 2025",
-        location: "Tech Building Room 210",
-        description: "A hands-on workshop focused on 3D modeling, CAD design, and rapid prototyping te" +
-                "chniques for engineering projects.",
-        image: "/mission.png"
-    }, {
-        id: 3,
-        title: "Shell Eco-Marathon Team Meet",
-        date: "May 8, 2025",
-        location: "Design Lab B",
-        description: "Join us to learn how our team builds efficient BLDC-powered cars for the Shell E" +
-                "co-Marathon competition!",
-        image: "/mission.png"
-    }
-];
+import Link from "next/link";
+import { useEvents } from "@/hooks/useEvents";
 
 export default function EventsPage() {
+    const { data: events, isLoading, error } = useEvents();
+
     return (
         <div className="min-h-screen bg-gray-100">
             {/* Hero Section */}
@@ -51,11 +20,11 @@ export default function EventsPage() {
                         className="opacity-90 object-cover"
                     />
                     {/* Left gradient */}
-                    <div className="absolute inset-y-0 left-0 w-64 bg-gradient-to-r from-white to-transparent"></div>
+                    <div className="absolute inset-y-0 left-0 w-64 bg-linear-to-r from-white to-transparent"></div>
                     {/* Right gradient */}
-                    <div className="absolute inset-y-0 right-0 w-64 bg-gradient-to-l from-white to-transparent"></div>
+                    <div className="absolute inset-y-0 right-0 w-64 bg-linear-to-l from-white to-transparent"></div>
                     {/* Bottom gradient */}
-                    <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-gray-100 to-transparent"></div>
+                    <div className="absolute bottom-0 left-0 right-0 h-32 bg-linear-to-t from-gray-100 to-transparent"></div>
                 </div>
 
                 {/* Hero Content */}
@@ -82,37 +51,64 @@ export default function EventsPage() {
                     Join us for workshops, competitions, and networking opportunities.
                 </p>
 
-                <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-3 gap-8">
-                    {events.map((event) => (
-                        <div
-                            key={event.id}
-                            className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-                            <div className="relative h-48 w-full overflow-hidden">
-                                <Image
-                                    src={event.image}
-                                    alt={event.title}
-                                    fill
-                                    className="object-cover"/>
-                            </div>
-                            <div className="p-6">
-                                <h2 className="text-xl font-bold mb-3 text-gray-800">
-                                    {event.title}
-                                </h2>
-                                <div className="space-y-2 mb-4">
-                                    <p className="text-sm text-gray-600 flex items-center gap-2">
-                                        <span className="text-yellow-500">📅</span> {event.date}
-                                    </p>
-                                    <p className="text-sm text-gray-600 flex items-center gap-2">
-                                        <span className="text-yellow-500">📍</span> {event.location}
-                                    </p>
+                {isLoading ? (
+                    <div className="flex justify-center py-12">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-yellow-500"></div>
+                    </div>
+                ) : error ? (
+                    <p className="text-red-500 text-center py-8">
+                        Failed to load events. Please try again later.
+                    </p>
+                ) : !events?.length ? (
+                    <p className="text-gray-500 text-center py-8">
+                        No upcoming events at this time.
+                    </p>
+                ) : (
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        {events.map((event) => (
+                            <Link
+                                key={event.eventId}
+                                href={event.eventUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="group bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+                            >
+                                <div className="relative h-48 w-full overflow-hidden">
+                                    {event.eventPicture ? (
+                                        <img
+                                            src={event.eventPicture}
+                                            alt={event.eventName}
+                                            className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                        />
+                                    ) : (
+                                        <div className="h-full w-full bg-gray-200 flex items-center justify-center">
+                                            <span className="text-gray-400 text-sm">No image available</span>
+                                        </div>
+                                    )}
                                 </div>
-                                {/* <p className="text-gray-700 text-sm leading-relaxed">
-                                    {event.description}
-                                </p> */}
-                            </div>
-                        </div>
-                    ))}
-                </div>
+                                <div className="p-6">
+                                    <h3 className="text-xl font-bold mb-3 text-gray-800 group-hover:text-yellow-600 transition-colors">
+                                        {event.eventName}
+                                    </h3>
+                                    <div className="space-y-2 mb-4">
+                                        {event.eventDates && (
+                                            <p className="text-sm text-gray-600 flex items-center gap-2">
+                                                <span className="text-yellow-500">📅</span>
+                                                {event.eventDates}
+                                            </p>
+                                        )}
+                                        {event.eventLocation && (
+                                            <p className="text-sm text-gray-600 flex items-center gap-2">
+                                                <span className="text-yellow-500">📍</span>
+                                                {event.eventLocation}
+                                            </p>
+                                        )}
+                                    </div>
+                                </div>
+                            </Link>
+                        ))}
+                    </div>
+                )}
             </div>
         </div>
     );

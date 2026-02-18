@@ -1,71 +1,71 @@
-import { TeamCard } from "@/components/ui/cards/TeamCard";
-import FormerPresidentCard from "@/components/ui/cards/FormerPresidentCard";
-import placeholder from "../../../../public/placeholder.jpeg";
+'use client'
+
 import Image from "next/image";
+import { useTeam, usePastPresidents, type TeamMember } from "@/hooks/useTeam";
+
+function MemberCard({ member }: { member: TeamMember }) {
+  return (
+    <div className="flex flex-col rounded-lg shadow-md overflow-hidden max-w-sm bg-white hover:shadow-xl transition-shadow duration-300 h-full">
+      <div className="relative h-64 overflow-hidden bg-gray-200">
+        <img
+          src={member.image}
+          alt={member.name}
+          className="w-full h-full object-cover"
+        />
+      </div>
+      <div className="p-6 flex flex-col grow">
+        <h3 className="text-2xl font-bold text-gray-900 mb-1 text-center">
+          {member.name}
+        </h3>
+        <p className="text-indigo-600 font-semibold text-sm uppercase tracking-wide text-center">
+          {member.position}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function TeamSection({ title, subtitle, members }: { title: string; subtitle: string; members: TeamMember[] }) {
+  if (!members.length) return null;
+
+  return (
+    <div className="mb-16">
+      <h2 className="text-4xl font-bold text-gray-800 mb-2">{title}</h2>
+      <p className="text-lg text-gray-600 mb-10">{subtitle}</p>
+      <div className={`grid gap-8 items-stretch ${
+        members.length === 1
+          ? 'grid-cols-1 max-w-sm mx-auto'
+          : members.length === 2
+            ? 'grid-cols-1 md:grid-cols-2 max-w-3xl mx-auto'
+            : 'grid-cols-1 md:grid-cols-3 lg:grid-cols-4'
+      }`}>
+        {members.map((member) => (
+          <MemberCard key={member.name} member={member} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function LoadingSkeleton() {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8">
+      {Array.from({ length: 4 }).map((_, i) => (
+        <div key={i} className="rounded-lg shadow-md overflow-hidden bg-white animate-pulse">
+          <div className="h-64 bg-gray-200" />
+          <div className="p-6 space-y-3">
+            <div className="h-6 bg-gray-200 rounded w-3/4 mx-auto" />
+            <div className="h-4 bg-gray-200 rounded w-1/2 mx-auto" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 export default function TeamPage() {
-  const teamMembers = [
-    {
-      image: placeholder,
-      name: "John Anderson",
-      role: "President",
-      major: "Mechanical Engineering",
-      bio: "Passionate about building innovative solutions and leading ASME towards sustainability and efficiency.",
-    },
-    {
-      image: placeholder,
-      name: "Sarah Martinez",
-      role: "Vice President",
-      major: "Electrical Engineering",
-      bio: "Driven by the challenge of designing efficient electrical systems for next-generation vehicles.",
-      
-    },
-    {
-      image: placeholder,
-      name: "David Kim",
-      role: "Mechanical Lead",
-      major: "Mechanical Engineering",
-      bio: "Focused on innovation in energy-efficient designs and mechanical optimization for competition vehicles.",
-      
-    },
-    {
-      image: placeholder,
-      name: "Emily Chen",
-      role: "Software Lead",
-      major: "Computer Engineering",
-      bio: "Passionate about integrating software and hardware to achieve cutting-edge vehicle control systems.",
-      
-    },
-    {
-      image: placeholder,
-      name: "Michael Rodriguez",
-      role: "Design Lead",
-      major: "Industrial Design",
-      bio: "Dedicated to crafting ergonomic and aerodynamic vehicle designs that combine efficiency and aesthetics.",
-      
-    }
-  ];
-
-  const formerPresidents = [
-    {
-      image: placeholder,
-      name: "Robert Johnson",
-      tenure: "2023 - 2024",
-      role: "Former President"
-    },
-    {
-      image: placeholder,
-      name: "Jessica Williams",
-      tenure: "2022 - 2023",
-      role: "FormerPresident"
-    },
-    {
-      image: placeholder,
-      name: "Marcus Thompson",
-      tenure: "2021 - 2022",
-      role: "Former President"
-    }
-  ];
+  const { data: team, isLoading, error } = useTeam();
+  const { data: pastPresidents, isLoading: pastLoading } = usePastPresidents();
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -79,11 +79,10 @@ export default function TeamPage() {
             fill
             className="object-cover"
           />
-        
           {/* Right gradient */}
-          <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-white to-transparent"></div>
+          <div className="absolute inset-y-0 right-0 w-32 bg-linear-to-l from-white to-transparent"></div>
           {/* Bottom gradient */}
-          <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-gray-100 to-transparent"></div>
+          <div className="absolute bottom-0 left-0 right-0 h-32 bg-linear-to-t from-gray-100 to-transparent"></div>
         </div>
 
         {/* Hero Content */}
@@ -117,53 +116,94 @@ export default function TeamPage() {
         </div>
       </section>
 
-      {/* Team Section */}
+      {/* Team Sections */}
       <div className="container mx-auto px-6 lg:px-12 py-16">
-
-      <h2 className="text-4xl font-bold text-gray-800 mb-2">
-        Meet the Lead Officers
-      </h2>
-      <p className="text-lg text-gray-600 mb-10">
-        From students to the leading engineers of tomorrow — pushing for an efficient future.
-      </p>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8 items-stretch">
-        {teamMembers.map((member, index) => (
-          <TeamCard
-            key={index}
-            variant="default"
-            image={member.image}
-            name={member.name}
-            role={member.role}
-            major={member.major}
-            bio={member.bio}
-            
-          />
-        ))}
-      </div>
-
-      {/* Former Presidents Section */}
-      <div className="mt-20 w-full max-w-7xl">
-        <h2 className="text-3xl font-bold text-gray-800 mb-2 text-center">
-          Former Presidents
-        </h2>
-        <p className="text-center text-lg text-gray-600 mb-10">
-          Honoring the leaders who shaped our organization&apos;s legacy.
-        </p>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {formerPresidents.map((president, index) => (
-            <FormerPresidentCard
-              key={index}
-              variant="default"
-              image={president.image}
-              name={president.name}
-              tenure={president.tenure}
-              role={president.role}
+        {isLoading ? (
+          <LoadingSkeleton />
+        ) : error ? (
+          <p className="text-red-500 text-center py-8">
+            Failed to load team members. Please try again later.
+          </p>
+        ) : team ? (
+          <>
+            <TeamSection
+              title="Leadership"
+              subtitle="From students to the leading engineers of tomorrow — pushing for an efficient future."
+              members={team.leadership}
             />
-          ))}
+            <TeamSection
+              title="Officers"
+              subtitle="The dedicated team members driving our day-to-day operations and initiatives."
+              members={team.officers}
+            />
+            <TeamSection
+              title="Mentors"
+              subtitle="Experienced guides helping shape the next generation of engineers."
+              members={team.mentors}
+            />
+            <TeamSection
+              title="Advisors"
+              subtitle="Faculty and industry professionals providing strategic guidance."
+              members={team.advisors}
+            />
+          </>
+        ) : null}
+
+        {/* Former Presidents Section */}
+        <div className="mt-20">
+          <h2 className="text-3xl font-bold text-gray-800 mb-2 text-center">
+            Former Presidents
+          </h2>
+          <p className="text-center text-lg text-gray-600 mb-10">
+            Honoring the leaders who shaped our organization&apos;s legacy.
+          </p>
+
+          {pastLoading ? (
+            <div className="flex justify-center py-12">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-yellow-500"></div>
+            </div>
+          ) : !pastPresidents?.length ? (
+            <p className="text-gray-500 text-center py-8">
+              No former presidents recorded yet.
+            </p>
+          ) : (
+            <div className={`grid gap-8 ${
+              pastPresidents.length === 1
+                ? 'grid-cols-1 max-w-md mx-auto'
+                : pastPresidents.length === 2
+                  ? 'grid-cols-1 md:grid-cols-2 max-w-3xl mx-auto'
+                  : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
+            }`}>
+              {pastPresidents.map((president) => (
+                <div
+                  key={president.id}
+                  className="rounded-lg shadow-md p-6 bg-white hover:shadow-xl transition-shadow duration-300"
+                >
+                  <div className="flex items-center gap-4">
+                    {president.photo_url ? (
+                      <img
+                        src={president.photo_url}
+                        alt={`Former President ${president.name}`}
+                        className="w-20 h-20 rounded-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center">
+                        <span className="text-gray-400 text-2xl font-bold">
+                          {president.name.charAt(0)}
+                        </span>
+                      </div>
+                    )}
+                    <div className="flex-1">
+                      <h3 className="text-xl font-bold text-gray-800">{president.name}</h3>
+                      <p className="text-sm text-gray-600">Former President</p>
+                      <p className="text-sm text-gray-500">{president.year}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
-      </div>
       </div>
     </div>
   );
