@@ -4,7 +4,7 @@ import Link from "next/link"
 import {usePathname} from "next/navigation"
 import {cn} from "@/lib/utils"
 import {Button} from "@/components/ui/buttons/Button"
-import {Home, FolderKanban, Users, Calendar} from "lucide-react"
+import {Home, FolderKanban, Users, Calendar, UserCog} from "lucide-react"
 import {DASHBOARD_ROUTES} from "@/config/routes"
 
 const navigation = [
@@ -20,6 +20,10 @@ const navigation = [
         name: "Team",
         href: DASHBOARD_ROUTES.TEAM,
         icon: Users
+    }, {
+        name: "Team Overrides",
+        href: DASHBOARD_ROUTES.TEAM_OVERRIDES,
+        icon: UserCog
     }, {
         name: "Events",
         href: DASHBOARD_ROUTES.EVENTS,

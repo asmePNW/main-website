@@ -1,10 +1,13 @@
 import { NextResponse } from "next/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 // ============ Types ============
 interface TeamMember {
   name: string;
   position: string;
   image: string;
+  linkedin_url?: string | null;
+  email?: string | null;
 }
 
 interface CategorizedTeam {
@@ -103,11 +106,53 @@ export async function GET() {
 
     const html = await response.text();
     const members = parseMembers(html);
-    const categorized = categorizeMembers(members);
+
+    // Fetch DB overrides (custom images, linkedin, email)
+    let overridesMap = new Map<
+      string,
+      { custom_image_url: string | null; linkedin_url: string | null; email: string | null }
+    >();
+
+    try {
+      const supabase = createAdminClient();
+      const { data: overrides } = await supabase
+        .from("team_member_overrides")
+        .select("member_name, custom_image_url, linkedin_url, email");
+
+      if (overrides) {
+        for (const o of overrides) {
+          overridesMap.set(o.member_name.toLowerCase(), {
+            custom_image_url: o.custom_image_url,
+            linkedin_url: o.linkedin_url,
+            email: o.email,
+          });
+        }
+      }
+    } catch (dbError) {
+      // DB failure is non-fatal — scraped data still works
+      console.error("Failed to fetch team member overrides:", dbError);
+    }
+
+    // Merge: if a scraped name matches a DB override, apply it
+    const mergedMembers = members.map((member) => {
+      const override = overridesMap.get(member.name.toLowerCase());
+      if (override) {
+        return {
+          ...member,
+          original_image: member.image,
+          image: override.custom_image_url || member.image,
+          linkedin_url: override.linkedin_url || null,
+          email: override.email || null,
+        };
+      }
+      return member;
+    });
+
+    const categorized = categorizeMembers(mergedMembers);
 
     return NextResponse.json({
       source: "html_parsed",
-      count: members.length,
+      count: mergedMembers.length,
       data: categorized,
     });
   } catch (error) {

@@ -617,6 +617,36 @@ export type Database = {
         }
         Relationships: []
       }
+      team_member_overrides: {
+        Row: {
+          created_at: string | null
+          custom_image_url: string | null
+          email: string | null
+          id: string
+          linkedin_url: string | null
+          member_name: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          custom_image_url?: string | null
+          email?: string | null
+          id?: string
+          linkedin_url?: string | null
+          member_name: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          custom_image_url?: string | null
+          email?: string | null
+          id?: string
+          linkedin_url?: string | null
+          member_name?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

@@ -5,15 +5,18 @@ import {faInstagram, faLinkedin, faFacebook, faXTwitter} from "@fortawesome/free
 import Image from "next/image"
 import ASMEPNWLogo from "../../../../public/ASMEPNWLogo.png"
 import { Button } from "@/components/ui/buttons/Button"
+import { createClient } from "@/lib/supabase/server"
 
-export function Footer() {
+export async function Footer() {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
     const year = new Date().getFullYear()
 
     return (
         <footer className="w-full border-t backdrop-blur bg-neutral-600">
             <div className="px-4 sm:px-8 lg:px-[15%] py-8 sm:py-12 flex flex-col lg:flex-row items-start lg:items-start justify-between text-white gap-8">
                 {/* Left — Logo */}
-                <div className="flex items-center flex-shrink-0">
+                <div className="flex items-center shrink-0">
                     <Image
                         src={ASMEPNWLogo}
                         alt="ASME PNW"
@@ -110,9 +113,11 @@ export function Footer() {
                             <FontAwesomeIcon icon={faXTwitter} className="h-5 w-5"/>
                         </Link> */}
                     </div>
-                    <Button variant="default" className="text-gray-300 hover:text-white transition-colors">
-                        <Link href="/login">Admin Login</Link>
-                    </Button>
+                    <Link href={user ? "/dashboard" : "/login"}>
+                        <Button variant="default" className="text-gray-300 hover:text-white transition-colors">
+                            {user ? "Dashboard" : "Admin Login"}
+                        </Button>
+                    </Link>
                 </div>
             </div>
 

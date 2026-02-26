@@ -6,6 +6,8 @@ export interface TeamMember {
     name: string
     position: string
     image: string
+    linkedin_url?: string | null
+    email?: string | null
 }
 
 export interface CategorizedTeam {

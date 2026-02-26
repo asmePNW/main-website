@@ -5,6 +5,7 @@ export const DASHBOARD_ROUTES = {
     SPONSORS: '/dashboard/sponsors',
     MEMBERS: '/dashboard/members',
     TEAM: '/dashboard/teams',
+    TEAM_OVERRIDES: '/dashboard/team-overrides',
     EVENTS: '/dashboard/events'
 }
 

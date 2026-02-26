@@ -11,6 +11,9 @@ CREATE TYPE contact_status AS ENUM ('new', 'in_progress', 'resolved', 'archived'
 -- Upload status enum
 CREATE TYPE upload_status AS ENUM ('draft', 'published', 'archived');
 
+-- Sponsor tier enum
+CREATE TYPE sponsor_tier AS ENUM ('platinum', 'gold', 'silver', 'bronze');
+
 -- =============================================
 -- PROFILES TABLE
 -- =============================================
@@ -181,7 +184,7 @@ CREATE TABLE projects (
   hero_image_url TEXT,
   category_id UUID REFERENCES project_categories(id) ON DELETE SET NULL,
   status upload_status DEFAULT 'draft',
-  featured BOOLEAN DEFAULT FALSE,
+  featured BOOLEAN NOT NULL DEFAULT FALSE,
   order_index INTEGER,
   created_by UUID REFERENCES profiles(id) ON DELETE SET NULL,
   created_at TIMESTAMPTZ DEFAULT NOW(),
@@ -222,7 +225,7 @@ CREATE TABLE sub_projects (
   description TEXT,
   image_url TEXT,
   content TEXT, -- Tiptap JSON content
-  author_name TEXT,
+  author_name TEXT NOT NULL DEFAULT 'Anonimous',
   status upload_status DEFAULT 'draft',
   published_at TIMESTAMPTZ,
   order_index INTEGER,
@@ -267,10 +270,9 @@ CREATE TABLE articles (
   image_url TEXT,
   content TEXT, -- Tiptap JSON content
   category_id UUID REFERENCES article_categories(id) ON DELETE SET NULL,
-  author_name TEXT,
+  author_name TEXT NOT NULL DEFAULT 'Anonimous',
   time_to_read INTEGER, -- in minutes
   status upload_status DEFAULT 'draft',
-  order_index INTEGER,
   published_at TIMESTAMPTZ,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
@@ -280,15 +282,41 @@ CREATE TRIGGER update_articles_updated_at BEFORE UPDATE ON articles
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- =============================================
--- PROJECT SPONSORS TABLE
+-- SPONSORS TABLE
 -- =============================================
 
+CREATE TABLE sponsors (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name TEXT NOT NULL,
+  logo_url TEXT,
+  order_index INTEGER,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  tier sponsor_tier NOT NULL,
+  description TEXT,
+  link TEXT
+);
 
+CREATE TRIGGER update_sponsors_updated_at BEFORE UPDATE ON sponsors
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+-- =============================================
+-- TEAM MEMBER OVERRIDES TABLE
+-- (Custom image, LinkedIn, email for web-scraped members)
+-- =============================================
 
-create trigger update_project_sponsors_updated_at BEFORE
-update on sponsors for EACH row
-execute FUNCTION update_updated_at_column ();
+CREATE TABLE team_member_overrides (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  member_name TEXT UNIQUE NOT NULL,
+  custom_image_url TEXT,
+  linkedin_url TEXT,
+  email TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TRIGGER update_team_member_overrides_updated_at BEFORE UPDATE ON team_member_overrides
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- =============================================
 -- AUDIT LOGS TABLE
@@ -322,7 +350,8 @@ ALTER TABLE project_components ENABLE ROW LEVEL SECURITY;
 ALTER TABLE sub_projects ENABLE ROW LEVEL SECURITY;
 ALTER TABLE project_team ENABLE ROW LEVEL SECURITY;
 ALTER TABLE articles ENABLE ROW LEVEL SECURITY;
-ALTER TABLE project_sponsors ENABLE ROW LEVEL SECURITY;
+ALTER TABLE sponsors ENABLE ROW LEVEL SECURITY;
+ALTER TABLE team_member_overrides ENABLE ROW LEVEL SECURITY;
 ALTER TABLE audit_logs ENABLE ROW LEVEL SECURITY;
 
 -- =============================================
@@ -646,26 +675,35 @@ CREATE POLICY "Admins and officers can manage articles"
   );
 
 -- =============================================
--- PROJECT SPONSORS POLICIES
+-- SPONSORS POLICIES
 -- =============================================
 
--- Everyone can view project sponsors
-CREATE POLICY "Everyone can view project sponsors"
-  ON project_sponsors FOR SELECT
+-- Everyone can view sponsors
+CREATE POLICY "Everyone can view sponsors"
+  ON sponsors FOR SELECT
+  USING (true);
+
+-- Admins and officers can manage sponsors
+CREATE POLICY "Admins and officers can manage sponsors"
+  ON sponsors FOR ALL
   USING (
     EXISTS (
-      SELECT 1 FROM projects 
-      WHERE id = project_sponsors.project_id 
-      AND status = 'published'
-    )
-    OR EXISTS (
       SELECT 1 FROM profiles WHERE id = auth.uid()
     )
   );
 
--- Admins and officers can manage sponsors
-CREATE POLICY "Admins and officers can manage project sponsors"
-  ON project_sponsors FOR ALL
+-- =============================================
+-- TEAM MEMBER OVERRIDES POLICIES
+-- =============================================
+
+-- Everyone can view team member overrides (public team page)
+CREATE POLICY "Everyone can view team member overrides"
+  ON team_member_overrides FOR SELECT
+  USING (true);
+
+-- Admins and officers can manage team member overrides
+CREATE POLICY "Admins and officers can manage team member overrides"
+  ON team_member_overrides FOR ALL
   USING (
     EXISTS (
       SELECT 1 FROM profiles WHERE id = auth.uid()
@@ -714,19 +752,21 @@ CREATE INDEX idx_project_components_order ON project_components(project_id, orde
 
 CREATE INDEX idx_sub_projects_project ON sub_projects(project_id);
 CREATE INDEX idx_sub_projects_status ON sub_projects(status);
-CREATE INDEX idx_sub_projects_author ON sub_projects(author_id);
+CREATE INDEX idx_sub_projects_author ON sub_projects(author_name);
 
 CREATE INDEX idx_project_team_project ON project_team(project_id);
 CREATE INDEX idx_project_team_team ON project_team(team_id);
 
 CREATE INDEX idx_articles_status ON articles(status);
 CREATE INDEX idx_articles_category ON articles(category_id);
-CREATE INDEX idx_articles_author ON articles(author_id);
+CREATE INDEX idx_articles_author ON articles(author_name);
 CREATE INDEX idx_articles_slug ON articles(slug);
 CREATE INDEX idx_articles_published_at ON articles(published_at DESC);
 
-CREATE INDEX idx_project_sponsors_project ON project_sponsors(project_id);
-CREATE INDEX idx_project_sponsors_order ON project_sponsors(project_id, order_index);
+CREATE INDEX idx_sponsors_tier ON sponsors(tier);
+CREATE INDEX idx_sponsors_order ON sponsors(order_index);
+
+CREATE INDEX idx_team_member_overrides_name ON team_member_overrides(member_name);
 
 CREATE INDEX idx_audit_logs_user ON audit_logs(user_id);
 CREATE INDEX idx_audit_logs_table ON audit_logs(table_name);
