@@ -11,16 +11,16 @@ export default function ProjectsPage() {
     const { data: featuredProjects, isLoading: featuredLoading } = useFeaturedProjects();
 
     return (
-        <div className="min-h-screen bg-black">
+        <div className="min-h-screen bg-gray-100 ">
             {/* Combined Hero and Category Section with Extended Background */}
             <section className="relative overflow-hidden">
                 {/* Background Image - extends to category section */}
-                <div className="absolute inset-0 z-0">
+                <div className="absolute inset-0 z-0 bg-black">
                     <Image
                         src="/project-cover.jpg"
                         alt="Hero Background"
                         fill
-                        className="opacity-30 object-cover"/>
+                        className="opacity-30 object-cover "/>
                     {/* Left side gradient - small */}
                  
                     {/* Bottom gradient */}
